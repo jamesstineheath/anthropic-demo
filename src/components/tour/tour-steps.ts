@@ -257,7 +257,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "end-card",
     narratorTitle: "Claude Agents",
-    narratorBody: "AI that earns your trust over time.\n\nProgressive trust isn't just a safety concept. It's a product mechanic that makes AI better — more context, more capability, more value over time.\n\nBuilt as a prototype by Alex Chen.",
+    narratorBody: "AI that earns your trust over time.\n\nProgressive trust isn't just a safety concept. It's a product mechanic that makes AI better — more context, more capability, more value over time.\n\nBuilt as a prototype by James Heath.",
     narratorPosition: "center",
     route: "/",
     xrayVisible: false,

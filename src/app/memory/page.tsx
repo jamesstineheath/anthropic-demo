@@ -125,8 +125,9 @@ export default function MemoryPage() {
         </>
       )}
 
-      {/* Detail modal */}
+      {/* Detail modal — modal={false} prevents focus trap so keyboard nav works */}
       <Dialog
+        modal={false}
         open={!!selectedMemoryId}
         onOpenChange={(open) => {
           if (!open) setSelectedMemoryId(null);

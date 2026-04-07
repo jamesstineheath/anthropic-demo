@@ -717,7 +717,7 @@ export const DEMO_STEPS: DemoStep[] = [
     tab: "discover",
     tour: {
       title: "Memory + Agents",
-      body: "Memory gives Claude persistent understanding. Agents give it the ability to act.\n\nTogether, they create AI that earns your trust over time. Progressive trust isn't just a safety concept — it's a product mechanic that makes AI better. More context, more capability, more value.\n\nBuilt as a prototype by Alex Chen.",
+      body: "Memory gives Claude persistent understanding. Agents give it the ability to act.\n\nTogether, they create AI that earns your trust over time. Progressive trust isn't just a safety concept — it's a product mechanic that makes AI better. More context, more capability, more value.\n\nBuilt as a prototype by James Heath.",
       position: "center",
     },
   },
