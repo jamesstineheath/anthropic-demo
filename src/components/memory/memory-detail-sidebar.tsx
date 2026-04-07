@@ -60,6 +60,10 @@ interface MemoryDetailSidebarProps {
   onClose: () => void;
   onNavigate: (id: string) => void;
   className?: string;
+  /** Tour mode: highlight feedback buttons */
+  tourFeedbackHint?: boolean;
+  /** Tour mode: show confirmed state with boosted confidence */
+  tourConfirmed?: boolean;
 }
 
 export function MemoryDetailSidebar({
@@ -67,11 +71,22 @@ export function MemoryDetailSidebar({
   onClose,
   onNavigate,
   className,
+  tourFeedbackHint,
+  tourConfirmed,
 }: MemoryDetailSidebarProps) {
   const [navStack, setNavStack] = React.useState<string[]>([memoryId]);
   const [feedback, setFeedback] = React.useState<"confirmed" | "editing" | null>(null);
   const [editValue, setEditValue] = React.useState("");
   const [menuOpen, setMenuOpen] = React.useState(false);
+
+  // Tour mode: auto-set feedback state
+  React.useEffect(() => {
+    if (tourConfirmed) {
+      setFeedback("confirmed");
+    } else if (tourFeedbackHint) {
+      setFeedback(null);
+    }
+  }, [tourConfirmed, tourFeedbackHint]);
 
   // When memoryId prop changes (from grid click), reset the stack
   React.useEffect(() => {
@@ -214,7 +229,12 @@ export function MemoryDetailSidebar({
 
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <span className="text-muted-foreground/60 w-16 shrink-0">Confidence</span>
-              <ConfidenceBar value={memory.confidence} />
+              <ConfidenceBar value={tourConfirmed ? Math.min(memory.confidence + 0.13, 0.99) : memory.confidence} />
+              {tourConfirmed && (
+                <span className="text-[10px] font-medium text-emerald-600">
+                  +13% ↑
+                </span>
+              )}
             </div>
 
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -237,7 +257,9 @@ export function MemoryDetailSidebar({
                   "flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors",
                   feedback === "confirmed"
                     ? "bg-emerald-500/10 text-emerald-600 border border-emerald-200"
-                    : "text-muted-foreground border border-border hover:text-foreground hover:border-foreground/20"
+                    : tourFeedbackHint && !tourConfirmed
+                      ? "text-foreground border border-primary/40 bg-primary/5 ring-1 ring-primary/20 animate-pulse"
+                      : "text-muted-foreground border border-border hover:text-foreground hover:border-foreground/20"
                 )}
               >
                 <ThumbsUp className="h-3 w-3" />

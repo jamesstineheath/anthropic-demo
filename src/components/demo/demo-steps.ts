@@ -172,7 +172,7 @@ export const DEMO_STEPS: DemoStep[] = [
     route: "/memory",
     tour: {
       title: "Confidence & Correction",
-      body: "Not all memories are equal. Claude tracks confidence levels for each one — high for things you've stated directly, lower for inferences. You can correct any memory, and your feedback recalibrates the model. Click \"Explore Memory\" to browse the knowledge base.",
+      body: "Not all memories are equal. Claude tracks confidence levels for each one — high for things you've stated directly, lower for inferences. You can correct any memory, and your feedback recalibrates the model.",
       position: "top-right",
     },
     dialogue: [
@@ -202,11 +202,71 @@ export const DEMO_STEPS: DemoStep[] = [
     ],
   },
 
+  // ── Step 9: Explore Memory — Open grid ─────────────────────────────
+  {
+    id: "memory-open-grid",
+    label: "Explore Memory",
+    route: "/memory",
+    tour: {
+      title: "The Knowledge Base",
+      body: "This is every memory Claude has about you, organized by domain. Each card shows the memory content, which agent learned it, and a confidence indicator.\n\n🟢 Green = high confidence (directly stated or repeatedly observed)\n🟡 Amber = medium confidence (inferred from patterns)\n🟠 Orange = lower confidence (single mention or weak signal)",
+      position: "top-left",
+    },
+  },
+
+  // ── Step 10: Explore Memory — Select a memory ─────────────────────
+  {
+    id: "memory-select-card",
+    label: "Memory Detail",
+    route: "/memory",
+    tour: {
+      title: "Inside a Memory",
+      body: "Each memory has a full detail view. You can see exactly how it was learned, which agent contributed it, when it was created, and how confident Claude is.\n\nThis one — \"Prefers 25-minute meetings\" — was inferred from calendar patterns. The confidence bar shows 82%, meaning Claude is fairly sure but hasn't been explicitly told this.",
+      position: "top-left",
+    },
+  },
+
+  // ── Step 11: Memory — Confidence explained ────────────────────────
+  {
+    id: "memory-confidence-explain",
+    label: "Confidence Score",
+    route: "/memory",
+    tour: {
+      title: "How Confidence Works",
+      body: "Confidence is calculated from multiple signals:\n\n• **Direct statements** — you told Claude this → high confidence\n• **Repeated patterns** — observed multiple times → builds over time\n• **Single observations** — seen once → lower confidence\n• **Cross-agent corroboration** — multiple agents confirm it → confidence boost\n\nThe confidence score determines how much weight this memory gets in agent decision-making.",
+      position: "top-left",
+    },
+  },
+
+  // ── Step 12: Memory — Provide feedback ────────────────────────────
+  {
+    id: "memory-feedback",
+    label: "User Feedback",
+    route: "/memory",
+    tour: {
+      title: "Your Feedback Matters",
+      body: "You can confirm a memory with \"Looks right\" or correct it with \"Clarify or correct.\" This feedback is the most powerful signal in the system — a single confirmation from you is worth more than weeks of passive observation.\n\nLet's confirm this one.",
+      position: "top-left",
+    },
+  },
+
+  // ── Step 13: Memory — Confidence improves ─────────────────────────
+  {
+    id: "memory-feedback-result",
+    label: "Confidence Boost",
+    route: "/memory",
+    tour: {
+      title: "Confidence Improved",
+      body: "After confirmation, the confidence score jumped from 82% to 95%. But more importantly, connected memories also got a boost — confirming your meeting length preference also reinforces the system's understanding of your schedule patterns.\n\nThis is the feedback flywheel: your input makes the whole system smarter, not just one memory.",
+      position: "top-left",
+    },
+  },
+
   // ═══════════════════════════════════════════════════════════════════════
   // PART 3: AGENTS (v2)
   // ═══════════════════════════════════════════════════════════════════════
 
-  // ── Step 9: Transition to Agents ───────────────────────────────────
+  // ── Step 14: Transition to Agents ──────────────────────────────────
   {
     id: "intro-agents",
     label: "Introducing Agents",
