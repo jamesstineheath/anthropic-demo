@@ -38,6 +38,7 @@ export interface AgentMemory {
 interface ChatContextValue {
   messages: ChatMessage[];
   sendMessage: (content: string) => void;
+  addMessage: (msg: Omit<ChatMessage, "id" | "timestamp">) => void;
   isTyping: boolean;
   memory: AgentMemory;
   onboardingStep: number;
@@ -142,6 +143,20 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       }, firstMsg.delayMs);
     }
   }, [trustStage, onTeam, mounted]);
+
+  const addMessage = React.useCallback(
+    (msg: Omit<ChatMessage, "id" | "timestamp">) => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          ...msg,
+          id: `msg-${Date.now()}`,
+          timestamp: new Date(),
+        },
+      ]);
+    },
+    []
+  );
 
   const addAgentMessage = React.useCallback(
     (content: string, quickReplies?: string[], delayMs: number = 600) => {
@@ -316,6 +331,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       value={{
         messages,
         sendMessage,
+        addMessage,
         isTyping,
         memory,
         onboardingStep,

@@ -5,6 +5,7 @@ import * as React from "react";
 interface XRayContextValue {
   isXRayMode: boolean;
   toggleXRay: () => void;
+  setXrayVisible: (visible: boolean) => void;
 }
 
 const XRayContext = React.createContext<XRayContextValue | undefined>(undefined);
@@ -16,8 +17,12 @@ export function XRayProvider({ children }: { children: React.ReactNode }) {
     setIsXRayMode((prev) => !prev);
   }, []);
 
+  const setXrayVisible = React.useCallback((visible: boolean) => {
+    setIsXRayMode(visible);
+  }, []);
+
   return (
-    <XRayContext.Provider value={{ isXRayMode, toggleXRay }}>
+    <XRayContext.Provider value={{ isXRayMode, toggleXRay, setXrayVisible }}>
       {children}
     </XRayContext.Provider>
   );

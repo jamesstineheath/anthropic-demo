@@ -24,6 +24,7 @@ export function AgentCard({ agent, featured, viewOnly }: AgentCardProps) {
 
   const cardContent = (
     <Card
+      data-tour={`agent-card-${agent.id}`}
       className={cn(
         "group relative border transition-all duration-200",
         featured && "ring-1 ring-primary/20",

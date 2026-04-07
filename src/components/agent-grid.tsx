@@ -27,7 +27,7 @@ export function AgentGrid() {
   const rest = agents.filter((a) => !a.isDeepAgent);
 
   return (
-    <div>
+    <div data-tour="agent-grid">
       {/* Featured Calendaring card */}
       {calendaring && (
         <div className="mb-4">

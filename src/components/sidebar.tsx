@@ -43,7 +43,6 @@ function SidebarContent() {
               alt="Claude"
               width={24}
               height={24}
-              className="dark:invert"
             />
             <span className="text-[15px] font-semibold tracking-tight">
               Claude

@@ -49,7 +49,7 @@ export function ChatBubble({
       <div className={cn("max-w-[85%]", !isAgent && "order-first")}>
         <div
           className={cn(
-            "rounded-2xl px-3.5 py-2.5 text-[13px] leading-relaxed",
+            "rounded-2xl px-3.5 py-2.5 text-[15px] leading-relaxed",
             isAgent
               ? "bg-secondary text-foreground rounded-tl-md"
               : "bg-primary text-primary-foreground rounded-tr-md"

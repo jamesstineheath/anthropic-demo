@@ -139,4 +139,9 @@
   html {
     @apply font-sans;
   }
+
+  /* Presentation-mode: enforce minimum readable sizes */
+  .text-\[9px\], .text-\[10px\] {
+    font-size: 11px !important;
+  }
 }

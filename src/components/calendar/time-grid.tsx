@@ -86,47 +86,107 @@ export function TimeGrid({ days, onEventClick, onSlotClick }: TimeGridProps) {
 
               {/* Events overlay */}
               <div className="absolute inset-0 pointer-events-none">
-                {dayEvents.map((event) => {
-                  const startHour =
-                    getHours(event.start) + getMinutes(event.start) / 60;
-                  const endHour =
-                    getHours(event.end) + getMinutes(event.end) / 60;
-                  if (startHour < 7 || startHour > 22) return null;
-                  const top = ((startHour - 7) / 15) * 100;
-                  const height = ((endHour - startHour) / 15) * 100;
-                  if (event.isDeclined) return null;
-                  const colors = getEventColors(event);
+                {(() => {
+                  // Build positioned events with overlap columns
+                  const positioned = dayEvents
+                    .filter(e => !e.isDeclined)
+                    .map(event => {
+                      const startHour = getHours(event.start) + getMinutes(event.start) / 60;
+                      const endHour = getHours(event.end) + getMinutes(event.end) / 60;
+                      return { event, startHour, endHour };
+                    })
+                    .filter(e => e.startHour >= 7 && e.startHour <= 22);
 
-                  return (
-                    <div
-                      key={event.id}
-                      className={cn(
-                        "absolute left-0.5 right-0.5 pointer-events-auto cursor-pointer rounded-md border px-1.5 py-0.5 text-[10px] leading-tight overflow-hidden transition-opacity hover:opacity-90",
-                        colors.bg,
-                        colors.text,
-                        colors.border,
-                        colors.darkBg,
-                        colors.darkText,
-                        event.isConflict && "ring-1 ring-red-400/50"
-                      )}
-                      style={{
-                        top: `${top}%`,
-                        height: `${Math.max(height, 2.5)}%`,
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onEventClick(event);
-                      }}
-                    >
-                      <div className="font-medium truncate">{event.title}</div>
-                      {height > 4 && (
-                        <div className="opacity-70 truncate">
-                          {format(event.start, "h:mm a")}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+                  // Detect collision groups
+                  function assignColumns(events: typeof positioned) {
+                    const columns: (typeof positioned[0])[][] = [];
+                    for (const item of events) {
+                      let placed = false;
+                      for (const col of columns) {
+                        const lastInCol = col[col.length - 1];
+                        if (item.startHour >= lastInCol.endHour) {
+                          col.push(item);
+                          placed = true;
+                          break;
+                        }
+                      }
+                      if (!placed) columns.push([item]);
+                    }
+                    return columns;
+                  }
+
+                  // Find all overlapping groups
+                  const result: Array<{ item: typeof positioned[0]; colIndex: number; totalCols: number }> = [];
+
+                  // Sort by start time
+                  const sorted = [...positioned].sort((a, b) => a.startHour - b.startHour);
+
+                  // Group overlapping events
+                  let i = 0;
+                  while (i < sorted.length) {
+                    // Find all events that overlap with current group
+                    const group: typeof positioned = [sorted[i]];
+                    let maxEnd = sorted[i].endHour;
+                    let j = i + 1;
+                    while (j < sorted.length && sorted[j].startHour < maxEnd) {
+                      group.push(sorted[j]);
+                      maxEnd = Math.max(maxEnd, sorted[j].endHour);
+                      j++;
+                    }
+
+                    // Assign columns within group
+                    const cols = assignColumns(group);
+                    const totalCols = cols.length;
+                    cols.forEach((col, colIndex) => {
+                      col.forEach(item => {
+                        result.push({ item, colIndex, totalCols });
+                      });
+                    });
+
+                    i = j;
+                  }
+
+                  return result.map(({ item, colIndex, totalCols }) => {
+                    const { event, startHour, endHour } = item;
+                    const top = ((startHour - 7) / 15) * 100;
+                    const height = Math.max(((endHour - startHour) / 15) * 100, 2.67); // min 40px of 1500px
+                    const colors = getEventColors(event);
+                    const widthPct = 100 / totalCols;
+                    const leftPct = colIndex * widthPct;
+
+                    return (
+                      <div
+                        key={event.id}
+                        className={cn(
+                          "absolute pointer-events-auto cursor-pointer rounded border-l-2 px-1 py-0.5 text-[11px] leading-tight overflow-hidden transition-opacity hover:opacity-90",
+                          colors.bg,
+                          colors.text,
+                          colors.darkBg,
+                          colors.darkText,
+                          event.isConflict && "ring-1 ring-red-400/50"
+                        )}
+                        style={{
+                          top: `${top}%`,
+                          height: `${height}%`,
+                          left: `calc(${leftPct}% + 2px)`,
+                          width: `calc(${widthPct}% - 4px)`,
+                          borderLeftColor: 'currentColor',
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEventClick(event);
+                        }}
+                      >
+                        <div className="font-medium truncate text-[11px]">{event.title}</div>
+                        {height > 3.5 && (
+                          <div className="opacity-70 truncate text-[10px]">
+                            {format(event.start, "h:mm a")}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  });
+                })()}
 
                 {/* Current time indicator */}
                 {today && <CurrentTimeLine />}

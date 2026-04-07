@@ -5,10 +5,13 @@ import { Sidebar } from "@/components/sidebar";
 import { SidebarMobile } from "@/components/sidebar-mobile";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { XRayToggle } from "@/components/xray-toggle";
+import { TourOverlay } from "@/components/tour/tour-overlay";
+import { useTour } from "@/components/providers/tour-provider";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAgentDetail = pathname.startsWith("/agents/");
+  const { startTour } = useTour();
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
@@ -25,6 +28,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <SidebarMobile />
           </div>
           <div className="flex items-center gap-1">
+            <button
+              onClick={startTour}
+              className="px-2 py-1 text-xs text-muted-foreground hover:text-foreground transition-colors rounded"
+            >
+              Tour
+            </button>
             <XRayToggle />
             <ThemeToggle />
           </div>
@@ -41,6 +50,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           )}
         </main>
       </div>
+
+      <TourOverlay />
     </div>
   );
 }

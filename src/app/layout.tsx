@@ -5,6 +5,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { TeamProvider } from "@/components/providers/team-provider";
 import { XRayProvider } from "@/components/providers/xray-provider";
+import { TourProvider } from "@/components/providers/tour-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppShell } from "@/components/app-shell";
 
@@ -39,9 +40,11 @@ export default function RootLayout({
         <ThemeProvider>
           <TeamProvider>
             <XRayProvider>
-              <TooltipProvider>
-                <AppShell>{children}</AppShell>
-              </TooltipProvider>
+              <TourProvider>
+                <TooltipProvider>
+                  <AppShell>{children}</AppShell>
+                </TooltipProvider>
+              </TourProvider>
             </XRayProvider>
           </TeamProvider>
         </ThemeProvider>
