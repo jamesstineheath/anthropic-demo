@@ -19,8 +19,8 @@ const NAV_ITEMS = [
   { icon: FolderOpen, label: "Projects", href: "#", decorative: true },
   { icon: Blocks, label: "Artifacts", href: "#", decorative: true },
   { icon: Code, label: "Code", href: "#", decorative: true },
-  { icon: Users, label: "Agents", href: "/", decorative: false, tourId: "agents-nav" },
-  { icon: Brain, label: "Memory", href: "/memory", decorative: false },
+  { icon: Brain, label: "Memory", href: "/memory", decorative: false, badge: "v1", tourId: "memory-nav" },
+  { icon: Users, label: "Agents", href: "/", decorative: false, badge: "v2", tourId: "agents-nav" },
 ];
 
 export function SidebarNav() {
@@ -52,7 +52,7 @@ export function SidebarNav() {
           );
         }
 
-        const showBadge = !("isHome" in item && item.isHome);
+        const badgeText = "badge" in item ? item.badge : undefined;
 
         return (
           <Link
@@ -68,9 +68,9 @@ export function SidebarNav() {
           >
             <Icon className="h-4 w-4" />
             <span>{item.label}</span>
-            {showBadge && (
+            {badgeText && (
               <Badge className="ml-auto h-4 px-1.5 text-xs font-semibold bg-terracotta/15 text-terracotta hover:bg-terracotta/15 border-0">
-                New
+                {badgeText}
               </Badge>
             )}
           </Link>

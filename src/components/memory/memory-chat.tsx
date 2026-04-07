@@ -5,6 +5,8 @@ import { Plus, FolderOpen, AudioLines, ChevronDown, Brain, User } from "lucide-r
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { MEMORY_ITEMS } from "@/lib/memory/data";
+import { useDemo } from "@/components/demo/demo-provider";
+import { DEMO_STEPS } from "@/components/demo/demo-steps";
 
 interface MemoryChatMessage {
   id: string;
@@ -71,6 +73,72 @@ export function MemoryChat() {
   const [input, setInput] = React.useState("");
   const [isTyping, setIsTyping] = React.useState(false);
   const scrollRef = React.useRef<HTMLDivElement>(null);
+  const { mode, stepIndex, currentStep, visibleDialogue, isTyping: demoIsTyping } = useDemo();
+  const prevStepRef = React.useRef(stepIndex);
+
+  // Tour mode: inject demo dialogue into chat
+  const isTourOnMemory = mode === "tour" && currentStep.route === "/memory";
+
+  // Build tour messages from chain replay + visible dialogue
+  const [tourMessages, setTourMessages] = React.useState<MemoryChatMessage[]>([]);
+  const lastInjectedRef = React.useRef(0);
+
+  React.useEffect(() => {
+    if (!isTourOnMemory) return;
+    const isStepChange = prevStepRef.current !== stepIndex;
+    prevStepRef.current = stepIndex;
+
+    if (isStepChange) {
+      lastInjectedRef.current = visibleDialogue.length;
+      // Replay chain
+      const chain: MemoryChatMessage[] = [];
+      if (currentStep.continueDialogue) {
+        let i = stepIndex - 1;
+        while (i >= 0) {
+          const step = DEMO_STEPS[i];
+          if (step.dialogue) {
+            for (const msg of step.dialogue) {
+              chain.push({ id: `tour-${i}-${chain.length}`, role: msg.role, content: msg.content });
+            }
+          }
+          if (!step.continueDialogue) break;
+          i--;
+        }
+      }
+      setTourMessages(chain);
+    }
+  }, [stepIndex, isTourOnMemory, currentStep, visibleDialogue]);
+
+  // Inject new visible dialogue entries
+  React.useEffect(() => {
+    if (!isTourOnMemory || !currentStep.dialogue?.length) return;
+    if (visibleDialogue.length < lastInjectedRef.current) {
+      lastInjectedRef.current = 0;
+    }
+    const newMsgs = visibleDialogue.slice(lastInjectedRef.current);
+    if (newMsgs.length > 0) {
+      setTourMessages(prev => [
+        ...prev,
+        ...newMsgs.map((msg, i) => ({
+          id: `tour-vis-${Date.now()}-${i}`,
+          role: msg.role,
+          content: msg.content,
+        })),
+      ]);
+      lastInjectedRef.current = visibleDialogue.length;
+    }
+  }, [visibleDialogue, isTourOnMemory, currentStep]);
+
+  // Clear tour messages when leaving memory route in tour
+  React.useEffect(() => {
+    if (!isTourOnMemory) {
+      setTourMessages([]);
+      lastInjectedRef.current = 0;
+    }
+  }, [isTourOnMemory]);
+
+  const displayMessages = isTourOnMemory ? tourMessages : messages;
+  const displayIsTyping = isTourOnMemory ? demoIsTyping : isTyping;
 
   const scrollToBottom = React.useCallback(() => {
     if (scrollRef.current) {
@@ -80,7 +148,7 @@ export function MemoryChat() {
 
   React.useEffect(() => {
     scrollToBottom();
-  }, [messages, isTyping, scrollToBottom]);
+  }, [displayMessages, displayIsTyping, scrollToBottom]);
 
   const handleSend = React.useCallback(
     (text: string) => {
@@ -115,7 +183,7 @@ export function MemoryChat() {
     handleSend(input);
   };
 
-  const showEmptyState = messages.length === 0 && !isTyping;
+  const showEmptyState = displayMessages.length === 0 && !displayIsTyping;
 
   return (
     <div className="flex h-full flex-col">
@@ -146,21 +214,23 @@ export function MemoryChat() {
                 your entire team. Ask me anything about what I know.
               </p>
             </div>
-            <div className="space-y-2 w-full max-w-xs pt-2">
-              {PROMPT_SUGGESTIONS.map((prompt) => (
-                <button
-                  key={prompt}
-                  onClick={() => handleSend(prompt)}
-                  className="w-full text-left rounded-lg border border-border px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-accent/50 transition-colors"
-                >
-                  {prompt}
-                </button>
-              ))}
-            </div>
+            {!isTourOnMemory && (
+              <div className="space-y-2 w-full max-w-xs pt-2">
+                {PROMPT_SUGGESTIONS.map((prompt) => (
+                  <button
+                    key={prompt}
+                    onClick={() => handleSend(prompt)}
+                    className="w-full text-left rounded-lg border border-border px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-accent/50 transition-colors"
+                  >
+                    {prompt}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
-        {messages.map((msg) => (
+        {displayMessages.map((msg) => (
           <div
             key={msg.id}
             className={cn(
@@ -191,7 +261,7 @@ export function MemoryChat() {
           </div>
         ))}
 
-        {isTyping && (
+        {displayIsTyping && (
           <div className="flex gap-2.5">
             <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 mt-0.5">
               <Image src="/claude-logo.svg" alt="Claude" width={14} height={14} />

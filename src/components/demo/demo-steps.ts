@@ -45,6 +45,10 @@ export interface DemoStep {
 }
 
 export const DEMO_STEPS: DemoStep[] = [
+  // ═══════════════════════════════════════════════════════════════════════
+  // PART 1: WELCOME
+  // ═══════════════════════════════════════════════════════════════════════
+
   // ── Step 0: Claude Home Screen ──────────────────────────────────────
   {
     id: "home",
@@ -57,21 +61,166 @@ export const DEMO_STEPS: DemoStep[] = [
     },
   },
 
-  // ── Step 1: Introducing Agents ───────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════════
+  // PART 2: MEMORY (v1)
+  // ═══════════════════════════════════════════════════════════════════════
+
+  // ── Step 1: Introducing Memory ──────────────────────────────────────
+  {
+    id: "intro-memory",
+    label: "Introducing Memory",
+    route: "/home",
+    tour: {
+      title: "Introducing Universal Memory",
+      body: "Memory is a new feature in Claude that lets it learn and remember things about you across conversations. Instead of starting from scratch every time, Claude builds a persistent understanding of your preferences, relationships, and life context.\n\nLet's explore what this looks like.",
+      position: "top-right",
+      spotlight: "[data-tour='memory-nav']",
+      spotlightPadding: 8,
+    },
+  },
+
+  // ── Step 2: Memory Chat ────────────────────────────────────────────
+  {
+    id: "memory-chat",
+    label: "Memory Chat",
+    route: "/memory",
+    tour: {
+      title: "Talk to Your Memory",
+      body: "This is the Memory interface. On the left is a conversational view — you can ask Claude what it knows about you, explore what it's learned, and correct anything that's wrong.\n\nThink of it as a conversation with your own context layer.",
+      position: "top-right",
+    },
+  },
+
+  // ── Step 3: Memory — Ask about schedule ────────────────────────────
+  {
+    id: "memory-ask-schedule",
+    label: "Exploring Memories",
+    route: "/memory",
+    tour: {
+      title: "Querying Your Knowledge",
+      body: "You can ask natural questions like \"What do you know about my schedule?\" and Claude will draw from everything it's learned — both things you've said directly and patterns it's observed over time.",
+      position: "top-right",
+    },
+    dialogue: [
+      {
+        role: "user",
+        content: "What do you know about my schedule preferences?",
+      },
+    ],
+  },
+
+  // ── Step 4: Memory — Schedule response ──────────────────────────────
+  {
+    id: "memory-schedule-response",
+    label: "Learned Preferences",
+    route: "/memory",
+    continueDialogue: true,
+    tour: {
+      title: "Learned, Not Programmed",
+      body: "Claude didn't have a template for this. It assembled this understanding from onboarding questions, calendar patterns, and your corrections over time. Notice it cites where each piece of knowledge came from.",
+      position: "top-right",
+    },
+    dialogue: [
+      {
+        role: "agent",
+        content: "Your schedule preferences are some of my highest-confidence memories. I know you protect Wednesday mornings for deep work, have a hard 5:00–7:00pm family boundary every day, and prefer 25-minute meetings over 30-minute defaults.\n\nYour Calendar agent learned these through a combination of what you told me during onboarding and patterns observed over 6 weeks of behavior. I also know your commute pattern affects what meeting times are realistic on different days.",
+      },
+    ],
+  },
+
+  // ── Step 5: Memory — Ask about cross-agent ─────────────────────────
+  {
+    id: "memory-ask-cross-agent",
+    label: "Cross-Agent Memory",
+    route: "/memory",
+    tour: {
+      title: "Memory Across Agents",
+      body: "The real power of Memory is that it's shared. When one agent learns something about you, every other agent benefits. This is how Claude builds a coherent understanding of your whole life.",
+      position: "top-right",
+    },
+    dialogue: [
+      {
+        role: "user",
+        content: "How do my agents share information?",
+      },
+    ],
+  },
+
+  // ── Step 6: Memory — Cross-agent response ──────────────────────────
+  {
+    id: "memory-cross-agent-response",
+    label: "Shared Context",
+    route: "/memory",
+    continueDialogue: true,
+    tour: {
+      title: "The Universal Memory Layer",
+      body: "This is the key insight: memories become more valuable when they're shared. A scheduling preference learned by one agent becomes a constraint respected by all of them. This is how personalization compounds over time.",
+      position: "top-right",
+    },
+    dialogue: [
+      {
+        role: "agent",
+        content: "Agents share context through the universal memory layer you're looking at right now. When your Calendar agent learns that you work from home on Fridays, your Date Night Planner can use that to suggest Friday evenings.\n\nWhen your Friend Keeper notices you haven't seen your college group in months, it can check your Calendar data for realistic windows to reconnect. Right now, 5 of your 13 memories involve cross-agent reasoning — marked with a ✨ sparkle icon.",
+      },
+    ],
+  },
+
+  // ── Step 7: Memory — Confidence and correction ─────────────────────
+  {
+    id: "memory-confidence",
+    label: "Confidence Levels",
+    route: "/memory",
+    tour: {
+      title: "Confidence & Correction",
+      body: "Not all memories are equal. Claude tracks confidence levels for each one — high for things you've stated directly, lower for inferences. You can correct any memory, and your feedback recalibrates the model. Click \"Explore Memory\" to browse the knowledge base.",
+      position: "top-right",
+    },
+    dialogue: [
+      {
+        role: "user",
+        content: "What are you least confident about?",
+      },
+    ],
+  },
+
+  // ── Step 8: Memory — Confidence response ───────────────────────────
+  {
+    id: "memory-confidence-response",
+    label: "Transparent Uncertainty",
+    route: "/memory",
+    continueDialogue: true,
+    tour: {
+      title: "Transparent About Uncertainty",
+      body: "Claude is honest about what it doesn't know well. This transparency builds trust — you know exactly where it might be wrong, and your corrections make it better. This is a core design principle: AI should be auditable.",
+      position: "top-right",
+    },
+    dialogue: [
+      {
+        role: "agent",
+        content: "My lowest-confidence memories are based on inference rather than direct statements:\n\n• **School research** (65%) — inferred from a passing mention during scheduling\n• **College friend reconnection** (72%) — inferred from calendar absence, not anything you told me\n• **Nanny expense sensitivity** (70%) — from a single conversational reference\n\nThese are exactly where your feedback matters most. A thumbs-up or thumbs-down helps me calibrate.",
+      },
+    ],
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // PART 3: AGENTS (v2)
+  // ═══════════════════════════════════════════════════════════════════════
+
+  // ── Step 9: Transition to Agents ───────────────────────────────────
   {
     id: "intro-agents",
     label: "Introducing Agents",
     route: "/home",
     tour: {
-      title: "Introducing Claude Agents",
-      body: "Agents are a new feature in Claude — specialized AI assistants that learn your preferences, understand your context, and earn your trust over time.\n\nLet's click into the Agents tab to see how it works.",
+      title: "From Memory to Agents",
+      body: "Memory gives Claude persistent context. Agents give it the ability to act on that context.\n\nAgents are specialized AI assistants that learn your preferences, understand your world, and earn your trust over time. Each one follows the same progressive trust model.\n\nLet's see how it works.",
       position: "top-right",
       spotlight: "[data-tour='agents-nav']",
       spotlightPadding: 8,
     },
   },
 
-  // ── Step 2: Onboarding — Meet Agents ────────────────────────────────
+  // ── Step 10: Onboarding — Meet Agents ──────────────────────────────
   {
     id: "onboarding-agents",
     label: "Meet Agents",
@@ -86,7 +235,7 @@ export const DEMO_STEPS: DemoStep[] = [
     },
   },
 
-  // ── Step 3: Onboarding — Trust Model ────────────────────────────────
+  // ── Step 11: Onboarding — Trust Model ──────────────────────────────
   {
     id: "onboarding-trust",
     label: "Trust Model",
@@ -96,7 +245,7 @@ export const DEMO_STEPS: DemoStep[] = [
     onboardingSlide: 1,
   },
 
-  // ── Step 4: Onboarding — Shared Memory ──────────────────────────────
+  // ── Step 12: Onboarding — Shared Memory ────────────────────────────
   {
     id: "onboarding-memory",
     label: "Shared Memory",
@@ -106,7 +255,7 @@ export const DEMO_STEPS: DemoStep[] = [
     onboardingSlide: 2,
   },
 
-  // ── Step 5: Discover Tab ─────────────────────────────────────────────
+  // ── Step 13: Discover Tab ──────────────────────────────────────────
   {
     id: "discover",
     label: "Discover Agents",
@@ -121,7 +270,7 @@ export const DEMO_STEPS: DemoStep[] = [
     },
   },
 
-  // ── Step 6: Your Agents Tab ──────────────────────────────────────────
+  // ── Step 14: Your Agents Tab ───────────────────────────────────────
   {
     id: "your-agents",
     label: "Your Agents",
@@ -134,7 +283,7 @@ export const DEMO_STEPS: DemoStep[] = [
     },
   },
 
-  // ── Step 7: Enter Calendaring Agent ──────────────────────────────────
+  // ── Step 15: Enter Calendar Agent ──────────────────────────────────
   {
     id: "enter-calendaring",
     label: "Calendar Agent",
@@ -154,7 +303,7 @@ export const DEMO_STEPS: DemoStep[] = [
     },
   },
 
-  // ── Step 8: Agent introduces itself ─────────────────────────────────
+  // ── Step 16: Agent introduces itself ───────────────────────────────
   {
     id: "agent-intro",
     label: "Agent Introduction",
@@ -162,7 +311,7 @@ export const DEMO_STEPS: DemoStep[] = [
     trustStage: 0 as TrustStage,
     tour: {
       title: "The agent starts by learning",
-      body: "It introduces itself and explains what it can see. These first interactions establish the relationship.",
+      body: "It introduces itself and explains what it needs. These first interactions establish the relationship.",
       position: "top-right",
     },
     dialogue: [
@@ -173,7 +322,7 @@ export const DEMO_STEPS: DemoStep[] = [
     ],
   },
 
-  // ── Step 9: User connects calendar ──────────────────────────────────
+  // ── Step 17: User connects calendar ────────────────────────────────
   {
     id: "user-connects-calendar",
     label: "Connecting Calendar",
@@ -193,7 +342,7 @@ export const DEMO_STEPS: DemoStep[] = [
     ],
   },
 
-  // ── Step 10: Agent sees calendars and asks boundaries ───────────────
+  // ── Step 18: Agent asks boundaries ─────────────────────────────────
   {
     id: "agent-asks-boundaries",
     label: "Asking Boundaries",
@@ -213,7 +362,7 @@ export const DEMO_STEPS: DemoStep[] = [
     ],
   },
 
-  // ── Step 10: User shares boundaries ─────────────────────────────────
+  // ── Step 19: User shares boundaries ────────────────────────────────
   {
     id: "user-shares-boundaries",
     label: "Sharing Boundaries",
@@ -228,12 +377,12 @@ export const DEMO_STEPS: DemoStep[] = [
     dialogue: [
       {
         role: "user",
-        content: "Evenings from 5-7:30pm are sacred — that's dad time with my kids. And Wednesday mornings are my deep focus block, no meetings ever.",
+        content: "Evenings from 5–7pm are sacred — that's family time. And Wednesday mornings are my deep focus block, no meetings ever.",
       },
     ],
   },
 
-  // ── Step 11: Agent confirms boundaries ──────────────────────────────
+  // ── Step 20: Agent confirms boundaries ─────────────────────────────
   {
     id: "agent-confirms-boundaries",
     label: "Boundaries Set",
@@ -248,12 +397,12 @@ export const DEMO_STEPS: DemoStep[] = [
     dialogue: [
       {
         role: "agent",
-        content: "Got it. I've set two hard boundaries:\n\n• **5:00–7:30pm daily**: Protected family time (Dad mode)\n• **Wednesday mornings**: Deep focus block, no meetings\n\nThese are now absolute — I'll never suggest scheduling over them, and I'll flag any conflicts immediately. I've also shared these with your other agents so they respect them too.",
+        content: "Got it. I've set two hard boundaries:\n\n• **5:00–7:00pm daily**: Protected family time\n• **Wednesday mornings**: Deep focus block, no meetings\n\nThese are now absolute — I'll never suggest scheduling over them, and I'll flag any conflicts immediately. I've also shared these with your other agents so they respect them too.",
       },
     ],
   },
 
-  // ── Step 12: Trust Stage 1 ──────────────────────────────────────────
+  // ── Step 21: Trust Stage 1 ─────────────────────────────────────────
   {
     id: "trust-stage-1",
     label: "Stage 1: Observer",
@@ -274,12 +423,12 @@ export const DEMO_STEPS: DemoStep[] = [
     dialogue: [
       {
         role: "agent",
-        content: "I've reviewed your calendar for this week. Quick summary:\n\n• **18 meetings** across work and personal\n• **2 conflicts** I've spotted (both on Tuesday)\n• Your busiest day is Tuesday with back-to-back meetings from 9am-4pm\n\nWant me to walk through the conflicts?",
+        content: "I've reviewed your calendar for this week. Quick summary:\n\n• **18 meetings** across work and personal\n• **2 conflicts** I've spotted (both on Tuesday)\n• Your busiest day is Thursday with back-to-back meetings from 9am–4pm\n\nWant me to walk through the conflicts?",
       },
     ],
   },
 
-  // ── Step 13: Trust Stage 2 — User asks ──────────────────────────────
+  // ── Step 22: Trust Stage 2 — User asks ─────────────────────────────
   {
     id: "trust-stage-2-ask",
     label: "Stage 2: Advisor",
@@ -305,7 +454,7 @@ export const DEMO_STEPS: DemoStep[] = [
     ],
   },
 
-  // ── Step 14: Trust Stage 2 — Agent responds with patterns ───────────
+  // ── Step 23: Trust Stage 2 — Agent responds ────────────────────────
   {
     id: "trust-stage-2-response",
     label: "Pattern Recognition",
@@ -320,12 +469,12 @@ export const DEMO_STEPS: DemoStep[] = [
     dialogue: [
       {
         role: "agent",
-        content: "Your week is manageable but has one risk:\n\n**Monday-Wednesday**: Well-structured. Your deep focus block Wednesday is clean.\n**Thursday**: You have a 2-hour gap between meetings — perfect for the design review prep you keep pushing.\n**Friday**: Light, but your 1:1 with Lena is at 3pm which cuts into your natural wind-down.\n\nI've noticed you're most productive in 90+ minute blocks. Want me to start flagging when your schedule fragments below that?",
+        content: "Your week is manageable but has one risk:\n\n**Monday–Wednesday**: Well-structured. Your deep focus block Wednesday is clean.\n**Thursday**: You have a 2-hour gap between meetings — perfect for the design review prep you keep pushing.\n**Friday**: Light, but your 1:1 with Lena is at 3pm which cuts into your natural wind-down.\n\nI've noticed you're most productive in 90+ minute blocks. Want me to start flagging when your schedule fragments below that?",
       },
     ],
   },
 
-  // ── Step 15: Trust Stage 3 ──────────────────────────────────────────
+  // ── Step 24: Trust Stage 3 ─────────────────────────────────────────
   {
     id: "trust-stage-3",
     label: "Stage 3: Analyst",
@@ -346,12 +495,12 @@ export const DEMO_STEPS: DemoStep[] = [
     dialogue: [
       {
         role: "agent",
-        content: "Schedule health: **62/100** (down from 71 last week).\n\nBreakdown:\n• **Meeting load** is normal (18 hrs, your average)\n• **Personal time** is compressed — you're solo parenting Mon-Wed with Sarah traveling, which means zero buffer\n• **Focus blocks** — none longer than 90 min this week\n\nBiggest risk: Tuesday is your anniversary and your densest meeting day. If anything runs long, your evening is gone.",
+        content: "Schedule health: **62/100** (down from 71 last week).\n\nBreakdown:\n• **Meeting load** is normal (18 hrs, your average)\n• **Personal time** is compressed — you're solo parenting Mon–Wed with Sarah traveling, which means zero buffer\n• **Focus blocks** — none longer than 90 min this week\n\nBiggest risk: Tuesday is your anniversary and your densest meeting day. If anything runs long, your evening is gone.",
       },
     ],
   },
 
-  // ── Step 16: Trust Stage 4 — Conflict detected ─────────────────────
+  // ── Step 25: Trust Stage 4 — Conflict ──────────────────────────────
   {
     id: "trust-stage-4-conflict",
     label: "Stage 4: Conflict",
@@ -372,12 +521,12 @@ export const DEMO_STEPS: DemoStep[] = [
     dialogue: [
       {
         role: "agent",
-        content: "You just got a meeting request for Tuesday 6:30–7:30pm: 'Product Strategy Review' from Azita, marked urgent.\n\nI'd push back. Here's why:\n\n1. Tuesday is your anniversary (Chen Fam calendar)\n2. Dad mode starts at 5pm — you're solo parenting this week\n3. Even if you could attend, you'd miss bath time and dinner\n\nI can suggest Thursday 11am instead — you have a gap between Lena's 1:1 and your afternoon meetings, and Azita is free then too.\n\nWant me to propose the reschedule?",
+        content: "You just got a meeting request for Tuesday 6:30–7:30pm: 'Product Strategy Review' from Azita, marked urgent.\n\nI'd push back. Here's why:\n\n1. Tuesday is your anniversary (Chen Fam calendar)\n2. Family time starts at 5pm — you're solo parenting this week\n3. Even if you could attend, you'd miss bath time and dinner\n\nI can suggest Thursday 11am instead — you have a gap between your 1:1 and afternoon meetings, and Azita is free then too.\n\nWant me to propose the reschedule?",
       },
     ],
   },
 
-  // ── Step 17: Trust Stage 4 — User approves ─────────────────────────
+  // ── Step 26: Trust Stage 4 — User approves ─────────────────────────
   {
     id: "trust-stage-4-approve",
     label: "User Approves",
@@ -397,7 +546,7 @@ export const DEMO_STEPS: DemoStep[] = [
     ],
   },
 
-  // ── Step 18: Trust Stage 4 — Agent acts ────────────────────────────
+  // ── Step 27: Trust Stage 4 — Agent acts ────────────────────────────
   {
     id: "trust-stage-4-action",
     label: "Autonomous Action",
@@ -417,7 +566,7 @@ export const DEMO_STEPS: DemoStep[] = [
     ],
   },
 
-  // ── Step 19: Trust Stage 5 — Burnout signals ───────────────────────
+  // ── Step 28: Trust Stage 5 — Burnout signals ──────────────────────
   {
     id: "trust-stage-5-signals",
     label: "Stage 5: Burnout",
@@ -438,12 +587,12 @@ export const DEMO_STEPS: DemoStep[] = [
     dialogue: [
       {
         role: "agent",
-        content: "I'm seeing some patterns I want to flag. Over the last 3 weeks:\n\n1. **Copper walks dropped from 5/week to 3/week.** You used to alternate with Sarah, but you've been skipping yours on office days.\n2. **Focus blocks are getting overwritten.** 4 weeks ago you had 8 hrs/week of protected DNS time. Last week: 3 hrs.\n3. **Dad mode is creeping.** Twice last week you had work messages after 7:30pm.\n4. **Social calendar is empty.** No dinners with friends, no date night, no Havdalah attendance in 2 weeks.\n5. **Meeting decline rate spiked.** You declined 8 meetings last week (vs. average of 4).\n\nNone of these alone is alarming. Together, they suggest you're running hot.\n\nWant me to protect Friday as a reset day?",
+        content: "I'm seeing some patterns I want to flag. Over the last 3 weeks:\n\n1. **Copper walks dropped from 5/week to 3/week.** You used to alternate with Sarah, but you've been skipping yours on office days.\n2. **Focus blocks are getting overwritten.** 4 weeks ago you had 8 hrs/week of protected DNS time. Last week: 3 hrs.\n3. **Family time is creeping.** Twice last week you had work messages after 7pm.\n4. **Social calendar is empty.** No dinners with friends, no date night in 2 weeks.\n5. **Meeting decline rate spiked.** You declined 8 meetings last week (vs. average of 4).\n\nNone of these alone is alarming. Together, they suggest you're running hot.\n\nWant me to protect Friday as a reset day?",
       },
     ],
   },
 
-  // ── Step 20: Trust Stage 5 — User agrees ───────────────────────────
+  // ── Step 29: Trust Stage 5 — User agrees ──────────────────────────
   {
     id: "trust-stage-5-agree",
     label: "User Agrees",
@@ -463,7 +612,7 @@ export const DEMO_STEPS: DemoStep[] = [
     ],
   },
 
-  // ── Step 21: Trust Stage 5 — Full delegation ───────────────────────
+  // ── Step 30: Trust Stage 5 — Full delegation ──────────────────────
   {
     id: "trust-stage-5-action",
     label: "Full Delegation",
@@ -483,27 +632,19 @@ export const DEMO_STEPS: DemoStep[] = [
     ],
   },
 
-  // ── Step 22: Memory ─────────────────────────────────────────────────
-  {
-    id: "memory",
-    label: "Shared Memory",
-    route: "/memory",
-    tour: {
-      title: "Shared Memory",
-      body: "Everything your agents learn is stored here — preferences, patterns, relationships, routines. This is the shared context that makes agent collaboration possible.",
-      position: "top-right",
-    },
-  },
+  // ═══════════════════════════════════════════════════════════════════════
+  // PART 4: CONCLUSION
+  // ═══════════════════════════════════════════════════════════════════════
 
-  // ── Step 23: End ────────────────────────────────────────────────────
+  // ── Step 31: Summary ───────────────────────────────────────────────
   {
     id: "end",
     label: "Summary",
     route: "/",
     tab: "discover",
     tour: {
-      title: "Claude Agents",
-      body: "AI that earns your trust over time.\n\nProgressive trust isn't just a safety concept — it's a product mechanic that makes AI better. More context, more capability, more value over time.\n\nBuilt as a prototype by Alex Chen.",
+      title: "Memory + Agents",
+      body: "Memory gives Claude persistent understanding. Agents give it the ability to act.\n\nTogether, they create AI that earns your trust over time. Progressive trust isn't just a safety concept — it's a product mechanic that makes AI better. More context, more capability, more value.\n\nBuilt as a prototype by Alex Chen.",
       position: "center",
     },
   },
