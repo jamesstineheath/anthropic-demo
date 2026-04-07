@@ -10,6 +10,7 @@ import { ChatMessages } from "@/components/chat/chat-messages";
 import { ChatInput } from "@/components/chat/chat-input";
 import { AgentPanel } from "@/components/agent-panel";
 import { XRayOverlay } from "@/components/xray-overlay";
+import { DemoController } from "@/components/demo-controller";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -108,6 +109,8 @@ export default function CalendaringPage() {
 
         {/* X-Ray overlay */}
         <XRayOverlay />
+        {/* Demo controller */}
+        <DemoController />
       </ChatProvider>
     </CalendarProvider>
   );
