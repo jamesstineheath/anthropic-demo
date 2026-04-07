@@ -1,4 +1,5 @@
 import type { TrustStage } from "@/lib/agents/data";
+import type { CalendarView } from "@/lib/calendar/utils";
 
 export type DemoMode = "tour" | "interact" | "model";
 
@@ -42,6 +43,12 @@ export interface DemoStep {
 
   /** When true, append dialogue to existing chat instead of clearing */
   continueDialogue?: boolean;
+
+  /** Event title substrings to visually highlight on the calendar */
+  highlightEvents?: string[];
+
+  /** Override calendar view for this step */
+  calendarView?: CalendarView;
 }
 
 export const DEMO_STEPS: DemoStep[] = [
@@ -526,6 +533,8 @@ export const DEMO_STEPS: DemoStep[] = [
       body: "The agent doesn't just list events — it identifies energy patterns, flags risks, and offers to optimize. This is learned behavior, not scripted.",
       position: "top-right",
     },
+    highlightEvents: ["Focus block", "1:1 with Lena"],
+    calendarView: "three-day",
     dialogue: [
       {
         role: "agent",
@@ -578,6 +587,8 @@ export const DEMO_STEPS: DemoStep[] = [
       agentsContributing: 6,
       details: "Autonomous action within boundaries. Relationship tier data, confidence 97%. Can decline meetings, propose alternatives, block time — all based on learned preferences.",
     },
+    highlightEvents: ["Anniversary", "Family time"],
+    calendarView: "three-day",
     dialogue: [
       {
         role: "agent",
@@ -644,6 +655,7 @@ export const DEMO_STEPS: DemoStep[] = [
       agentsContributing: 7,
       details: "Full context window: 7 calendar sources, user preferences, shared memory from 7 agents, conversation history. Progressive trust flywheel: more trust → more data → better reasoning → more trust.",
     },
+    highlightEvents: ["Walk Copper", "Focus block", "Family time"],
     dialogue: [
       {
         role: "agent",
@@ -684,6 +696,7 @@ export const DEMO_STEPS: DemoStep[] = [
       body: "The agent coordinates across calendars, declines meetings, reschedules a 1:1, and even notifies another agent. This is the progressive trust flywheel at full speed.",
       position: "top-right",
     },
+    highlightEvents: ["1:1 with Lena", "Walk Copper"],
     dialogue: [
       {
         role: "agent",

@@ -3,7 +3,7 @@ import type { TrustStage } from "@/lib/agents/data";
 export interface ContextSource {
   label: string;
   tokens: number;
-  type: "native" | "shared-memory" | "system" | "conversation";
+  type: "native" | "shared-memory" | "system" | "conversation" | "tools";
   agentIcon?: string;
   agentName?: string;
 }
@@ -15,13 +15,24 @@ export interface XRayCapability {
   cluster: string;
 }
 
+export interface ToolDefinition {
+  name: string;
+  description: string;
+  unlocked: boolean;
+  stage: TrustStage;
+}
+
 export interface XRayData {
   systemPrompt: string;
   contextSources: ContextSource[];
   totalTokens: number;
+  retrievedTokens: number;
+  availableTokens: number;
   nativeTokens: number;
   sharedMemoryTokens: number;
   capabilities: XRayCapability[];
+  tools: ToolDefinition[];
+  modelId: string;
   confidence: {
     score: "high" | "medium" | "low";
     reason: string;
@@ -97,23 +108,6 @@ INSTRUCTIONS:
 - Reference the user's stated preferences when relevant.
 - If asked about something outside your data, say so honestly.
 
-CAPABILITIES AT THIS STAGE:
-✅ 1.1 Summarize calendar (next N days)
-✅ 1.2 Answer basic schedule questions
-✅ 1.3 Detect basic time conflicts
-✅ 1.5 Event creation assistance (draft only)
-✅ 1.7 Suggest available slots
-✅ 2.1 Time-of-day preferences (stated, not yet observed)
-❌ 2.3 Energy/focus constraints (Stage 2)
-❌ 3.1 Meeting load analysis (Stage 2)
-❌ 3.6 Schedule health scoring (Stage 3)
-❌ 4.2 Focus time protection (Stage 3)
-❌ 5.3 Relationship-priority conflicts (Stage 4)
-❌ 7.1 Auto-decline (Stage 5)
-
-SHARED MEMORY:
-- Fitness Coach: workout preferences, gym schedule (2,100 tokens)
-
 CONFIDENCE GUIDANCE:
 - HIGH: Direct data lookup or stated preference match
 - MEDIUM: Inference from limited data points
@@ -159,25 +153,6 @@ INSTRUCTIONS:
 - Still require user confirmation for any changes.
 - When suggesting alternatives, explain why using preference data.
 
-CAPABILITIES AT THIS STAGE:
-✅ Cluster 1: All information & basics
-✅ 2.1 Time-of-day preferences
-✅ 2.3 Energy/focus constraints
-✅ 2.4 Buffer time preferences
-✅ 2.5 Day-of-week patterns (home/office)
-✅ 2.6 Geographic/commute constraints
-✅ 3.1 Meeting load analysis
-❌ 3.6 Schedule health scoring (Stage 3)
-❌ 4.1 Rescheduling suggestions (Stage 3)
-❌ 4.2 Focus time protection (Stage 3)
-❌ 5.3 Relationship-priority conflicts (Stage 4)
-❌ 7.1 Auto-decline (Stage 5)
-
-SHARED MEMORY:
-- Fitness Coach: workout schedule, gym days, exercise preferences (3,400 tokens)
-- Friend Keeper: social connections, last-contact dates, friend groups (2,800 tokens)
-- Spending Tracker: budget categories, recurring expenses (1,200 tokens)
-
 CONFIDENCE GUIDANCE:
 - HIGH: Pattern observed 4+ times AND matches stated preference
 - MEDIUM: Pattern observed 2-3 times OR inferred from partial data
@@ -220,16 +195,6 @@ Components and weights:
   - Preference adherence (15%): % meetings matching time/energy prefs
   - Buffer compliance (15%): % transitions with adequate buffer
 
-DECLINE PATTERN ANALYSIS:
-- Consistently declined (auto-suggest decline):
-  · SW+XFN Weekly (Mon) — declined 6/8 weeks
-  · Charcoal Supply/Demand (Tue) — not his domain
-  · Software Design Weekly (Wed) — conflicts with no-recurring-Wed policy
-- Never declined (protect):
-  · 1:1 with Kristen (manager)
-  · 1:1 with Lena (direct report)
-  · Dad mode blocks
-
 RELATIONSHIP DATA:
 - Tier 1 (Family): Sarah, Emma, Max, Zoe, Copper
 - Tier 2 (Childcare): Maddie, Milla
@@ -243,26 +208,6 @@ INSTRUCTIONS:
 - Cross-reference multiple calendars to detect family/work conflicts.
 - Suggest rescheduling with specific alternative times and rationale.
 - Still require confirmation for any changes.
-
-CAPABILITIES AT THIS STAGE:
-✅ Clusters 1-2: All basics and preference learning
-✅ 3.1 Meeting load analysis
-✅ 3.3 Conflict detection & analysis (cross-calendar)
-✅ 3.6 Schedule health scoring
-✅ 3.8 Anomaly detection
-✅ 4.1 Rescheduling suggestions
-✅ 4.2 Focus time protection (propose, don't enforce)
-❌ 4.3 Meeting prep & context (Stage 4)
-❌ 5.1 Contact frequency tracking (Stage 4)
-❌ 5.3 Relationship-priority conflicts (Stage 4)
-❌ 6.1 Goal-aligned time blocking (Stage 4)
-❌ 7.1 Auto-decline (Stage 5)
-
-SHARED MEMORY:
-- Fitness Coach: workout schedule, recovery needs, gym preferences (4,800 tokens)
-- Friend Keeper: social graph, contact frequency, friend priorities (4,200 tokens)
-- Spending Tracker: budget, babysitter costs, recurring expenses (2,400 tokens)
-- Sleep Coach: sleep patterns, bedtime targets, wake data (3,100 tokens)
 
 CONFIDENCE GUIDANCE:
 - HIGH: Pattern validated 4+ weeks, cross-referenced across calendars
@@ -339,27 +284,6 @@ INSTRUCTIONS:
   availability alternatives.
 - For high-stakes moments (anniversaries, family events vs work):
   act decisively to protect personal time.
-
-CAPABILITIES AT THIS STAGE:
-✅ Clusters 1-3: All basics, preferences, patterns
-✅ 4.1 Rescheduling suggestions (with autonomous authority for T4+)
-✅ 4.2 Focus time protection (active enforcement)
-✅ 4.3 Meeting prep & context
-✅ 5.1 Contact frequency tracking
-✅ 5.3 Relationship-priority conflict resolution
-✅ 6.1 Goal-aligned time blocking
-❌ 6.4 Work-life balance monitoring (Stage 5)
-❌ 7.1 Auto-decline low-priority (Stage 5)
-❌ 7.2 Proactive rescheduling (Stage 5)
-❌ 7.5 Cross-calendar coordination (Stage 5)
-❌ XD-3 Burnout prediction (Stage 5)
-
-SHARED MEMORY:
-- Fitness Coach: full workout model, recovery, gym schedule (5,600 tokens)
-- Friend Keeper: social graph, contact frequency, nurture alerts (5,800 tokens)
-- Spending Tracker: budget, babysitter costs, date night budget (3,600 tokens)
-- Sleep Coach: circadian model, sleep debt, wake patterns (4,200 tokens)
-- Career Advisor: growth goals, skill gaps, development priorities (2,800 tokens)
 
 CONFIDENCE GUIDANCE:
 - HIGH (act autonomously): Pattern validated 4+ weeks + user-approved rule
@@ -439,24 +363,6 @@ INSTRUCTIONS:
 - When in doubt about autonomy boundaries, ASK. Trust is earned
   incrementally; overstepping resets it.
 
-CAPABILITIES AT THIS STAGE:
-✅ All Clusters 1-6
-✅ 7.1 Auto-decline low-priority meetings
-✅ 7.2 Proactive rescheduling (Tier 4+)
-✅ 7.3 Send meeting requests on behalf
-✅ 7.5 Cross-calendar coordination (Alex + Sarah + Maddie)
-✅ 6.4 Work-life balance monitoring
-✅ XD-3 Burnout prediction (5-signal model)
-
-SHARED MEMORY (8 contributing agents):
-- Fitness Coach: full model, recovery, streaks, gym schedule (6,800 tokens)
-- Friend Keeper: social graph, nurture alerts, event suggestions (7,200 tokens)
-- Spending Tracker: full budget, babysitter costs, date night fund (4,800 tokens)
-- Sleep Coach: circadian model, sleep debt, chronotype calibration (5,400 tokens)
-- Career Advisor: growth roadmap, skill tracking, development plan (4,200 tokens)
-- Meal Planner: meal prep schedule, dietary needs, grocery timing (2,400 tokens)
-- Home Maintenance: chore schedule, seasonal tasks, vendor contacts (1,800 tokens)
-
 CONFIDENCE GUIDANCE:
 - HIGH (act): Validated pattern + approved rule + single-domain
 - MEDIUM (act with notification): Cross-domain inference, strong signal
@@ -464,31 +370,75 @@ CONFIDENCE GUIDANCE:
 };
 
 // ---------------------------------------------------------------------------
-// Context Sources — structured token breakdown per level
+// Tool Definitions — progressive unlock per trust stage
+// ---------------------------------------------------------------------------
+
+function getTools(trustStage: TrustStage): ToolDefinition[] {
+  return [
+    // Stage 0: no tools (conversational only)
+    // Stage 1: read-only tools
+    { name: "list_events", description: "List events for a date range across all calendars", unlocked: trustStage >= 1, stage: 1 as TrustStage },
+    { name: "get_event", description: "Get full details of a specific event (attendees, description, recurrence)", unlocked: trustStage >= 1, stage: 1 as TrustStage },
+    { name: "find_free_time", description: "Find available time slots across one or more calendars", unlocked: trustStage >= 1, stage: 1 as TrustStage },
+    { name: "search_events", description: "Search events by title, attendee, or keyword", unlocked: trustStage >= 1, stage: 1 as TrustStage },
+    // Stage 2: preference + pattern tools
+    { name: "get_user_preferences", description: "Retrieve learned user preferences (chronotype, buffer, energy)", unlocked: trustStage >= 2, stage: 2 as TrustStage },
+    { name: "query_memory", description: "Retrieve shared memories from other agents via RAG", unlocked: trustStage >= 2, stage: 2 as TrustStage },
+    // Stage 3: analysis tools
+    { name: "compute_schedule_health", description: "Calculate schedule health score (0-100) with component breakdown", unlocked: trustStage >= 3, stage: 3 as TrustStage },
+    { name: "detect_conflicts", description: "Cross-calendar conflict detection with severity ranking", unlocked: trustStage >= 3, stage: 3 as TrustStage },
+    // Stage 4: write tools (with approval)
+    { name: "create_event", description: "Create a new calendar event (requires user approval)", unlocked: trustStage >= 4, stage: 4 as TrustStage },
+    { name: "update_event", description: "Modify an existing event (time, attendees, description)", unlocked: trustStage >= 4, stage: 4 as TrustStage },
+    { name: "decline_event", description: "Decline a meeting invite with optional message", unlocked: trustStage >= 4, stage: 4 as TrustStage },
+    { name: "check_attendee_availability", description: "Check free/busy for other attendees before proposing times", unlocked: trustStage >= 4, stage: 4 as TrustStage },
+    // Stage 5: autonomous + delegation tools
+    { name: "send_on_behalf", description: "Send calendar invite or message as Alex", unlocked: trustStage >= 5, stage: 5 as TrustStage },
+    { name: "auto_decline", description: "Decline meeting without approval (within approved rules)", unlocked: trustStage >= 5, stage: 5 as TrustStage },
+    { name: "notify_agent", description: "Send context update to another agent (e.g. Fitness Coach)", unlocked: trustStage >= 5, stage: 5 as TrustStage },
+    { name: "block_time", description: "Autonomously block time on calendar for protection", unlocked: trustStage >= 5, stage: 5 as TrustStage },
+  ];
+}
+
+// ---------------------------------------------------------------------------
+// Context Sources — realistic token breakdown per level
+//
+// Key design decision: we distinguish "retrieved" tokens (what's actually
+// sent per API call) from "available" tokens (total indexed data the agent
+// can pull from via RAG). This reflects real-world retrieval architecture.
 // ---------------------------------------------------------------------------
 
 function getContextSources(trustStage: TrustStage): ContextSource[] {
   const sources: ContextSource[] = [];
 
-  // System prompt
+  // System prompt (always sent in full)
   const systemTokens = [800, 1400, 2200, 3800, 5400, 7200][trustStage];
   sources.push({ label: "System prompt", tokens: systemTokens, type: "system" });
 
-  // Calendar data — grows as history window expands
-  const calendarTokens = [18200, 24500, 35800, 48000, 62000, 78000][trustStage];
-  sources.push({ label: "Calendar data (7 sources)", tokens: calendarTokens, type: "native" });
+  // Tool definitions (sent as tool schemas)
+  const toolTokens = [0, 480, 600, 920, 1400, 1800][trustStage];
+  if (toolTokens > 0) {
+    sources.push({ label: "Tool definitions", tokens: toolTokens, type: "tools" });
+  }
 
-  // User preference profile
-  const prefTokens = [0, 600, 1800, 3200, 4800, 6400][trustStage];
+  // Calendar data — retrieved subset, not full dump
+  // Available pool is much larger; agent retrieves relevant window via list_events
+  const calendarTokens = [0, 1800, 2400, 3200, 3800, 4200][trustStage];
+  if (calendarTokens > 0) {
+    sources.push({ label: "Calendar data (retrieved)", tokens: calendarTokens, type: "native" });
+  }
+
+  // User preference profile (structured JSON, grows with observations)
+  const prefTokens = [0, 400, 1200, 2000, 2800, 3400][trustStage];
   if (prefTokens > 0) {
     sources.push({ label: "User preferences", tokens: prefTokens, type: "native" });
   }
 
-  // Shared memory from other agents — progressive unlock
+  // Shared memory from other agents — retrieved via query_memory tool (RAG)
   if (trustStage >= 1) {
     sources.push({
       label: "Fitness Coach",
-      tokens: [0, 2100, 3400, 4800, 5600, 6800][trustStage],
+      tokens: [0, 350, 600, 800, 1000, 1200][trustStage],
       type: "shared-memory",
       agentIcon: "Dumbbell",
       agentName: "Fitness Coach",
@@ -497,14 +447,14 @@ function getContextSources(trustStage: TrustStage): ContextSource[] {
   if (trustStage >= 2) {
     sources.push({
       label: "Friend Keeper",
-      tokens: [0, 0, 2800, 4200, 5800, 7200][trustStage],
+      tokens: [0, 0, 450, 700, 900, 1100][trustStage],
       type: "shared-memory",
       agentIcon: "Users",
       agentName: "Friend Keeper",
     });
     sources.push({
       label: "Spending Tracker",
-      tokens: [0, 0, 1200, 2400, 3600, 4800][trustStage],
+      tokens: [0, 0, 200, 400, 600, 800][trustStage],
       type: "shared-memory",
       agentIcon: "DollarSign",
       agentName: "Spending Tracker",
@@ -513,7 +463,7 @@ function getContextSources(trustStage: TrustStage): ContextSource[] {
   if (trustStage >= 3) {
     sources.push({
       label: "Sleep Coach",
-      tokens: [0, 0, 0, 3100, 4200, 5400][trustStage],
+      tokens: [0, 0, 0, 500, 700, 900][trustStage],
       type: "shared-memory",
       agentIcon: "Moon",
       agentName: "Sleep Coach",
@@ -522,7 +472,7 @@ function getContextSources(trustStage: TrustStage): ContextSource[] {
   if (trustStage >= 4) {
     sources.push({
       label: "Career Advisor",
-      tokens: [0, 0, 0, 0, 2800, 4200][trustStage],
+      tokens: [0, 0, 0, 0, 450, 700][trustStage],
       type: "shared-memory",
       agentIcon: "Briefcase",
       agentName: "Career Advisor",
@@ -531,29 +481,38 @@ function getContextSources(trustStage: TrustStage): ContextSource[] {
   if (trustStage >= 5) {
     sources.push({
       label: "Meal Planner",
-      tokens: 2400,
+      tokens: 400,
       type: "shared-memory",
       agentIcon: "ChefHat",
       agentName: "Meal Planner",
     });
     sources.push({
       label: "Home Maintenance",
-      tokens: 1800,
+      tokens: 300,
       type: "shared-memory",
       agentIcon: "Wrench",
       agentName: "Home Maintenance",
     });
   }
 
-  // Conversation history
-  const convTokens = [200, 1200, 2400, 4500, 6800, 8600][trustStage];
+  // Conversation history (recent turns)
+  const convTokens = [200, 800, 1200, 1800, 2400, 3000][trustStage];
   sources.push({ label: "Conversation history", tokens: convTokens, type: "conversation" });
 
   return sources;
 }
 
 // ---------------------------------------------------------------------------
-// Capabilities — organized by cluster from capability_tree.md
+// Available data pool — what RAG can pull from (for context bar comparison)
+// ---------------------------------------------------------------------------
+
+function getAvailableTokens(trustStage: TrustStage): number {
+  // Total indexed data available for retrieval
+  return [1000, 28000, 52000, 78000, 98000, 124000][trustStage];
+}
+
+// ---------------------------------------------------------------------------
+// Capabilities — organized by cluster
 // ---------------------------------------------------------------------------
 
 function getCapabilities(trustStage: TrustStage): XRayCapability[] {
@@ -607,10 +566,17 @@ export const CAPABILITY_CLUSTERS: Record<string, string> = {
 };
 
 // ---------------------------------------------------------------------------
-// Previous-level token totals for delta display
+// Model IDs per stage
 // ---------------------------------------------------------------------------
 
-const LEVEL_TOKEN_TOTALS = [19200, 29800, 49600, 74000, 102200, 132800];
+const MODEL_IDS: Record<number, string> = {
+  0: "claude-sonnet-4-20250514",
+  1: "claude-sonnet-4-20250514",
+  2: "claude-sonnet-4-20250514",
+  3: "claude-sonnet-4-20250514",
+  4: "claude-opus-4-20250514",
+  5: "claude-opus-4-20250514",
+};
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -629,15 +595,16 @@ export function getXRayData(
   const meetingHours = [0, 12, 18, 22, 24, 26][trustStage];
 
   prompt = prompt
-    .replace("{chronotype}", preferences.chronotype || "Not set")
-    .replace("{meetingStyle}", preferences.meetingStyle || "Not set")
-    .replace("{protectedTime}", preferences.protectedTime || "Not set")
-    .replace("{frustration}", preferences.frustration || "Not set")
+    .replace("{chronotype}", preferences.chronotype || "Morning person — best focus before noon")
+    .replace("{meetingStyle}", preferences.meetingStyle || "Clustered, not scattered")
+    .replace("{protectedTime}", preferences.protectedTime || "5:00–7:30pm daily (family)")
+    .replace("{frustration}", preferences.frustration || "Back-to-back meetings with no prep time")
     .replace("{eventCount}", String(eventCount))
     .replace("{meetingHours}", String(meetingHours));
 
   const contextSources = getContextSources(trustStage);
-  const totalTokens = LEVEL_TOKEN_TOTALS[trustStage];
+  const retrievedTokens = contextSources.reduce((sum, s) => sum + s.tokens, 0);
+  const availableTokens = getAvailableTokens(trustStage);
   const nativeTokens = contextSources
     .filter((s) => s.type === "native")
     .reduce((sum, s) => sum + s.tokens, 0);
@@ -648,15 +615,23 @@ export function getXRayData(
   return {
     systemPrompt: prompt,
     contextSources,
-    totalTokens,
+    totalTokens: retrievedTokens,
+    retrievedTokens,
+    availableTokens,
     nativeTokens,
     sharedMemoryTokens,
     capabilities: getCapabilities(trustStage),
+    tools: getTools(trustStage),
+    modelId: MODEL_IDS[trustStage] || MODEL_IDS[0],
     confidence: lastConfidence ?? null,
   };
 }
 
 export function getTokenDelta(trustStage: TrustStage): number {
-  if (trustStage === 0) return 0;
-  return LEVEL_TOKEN_TOTALS[trustStage] - LEVEL_TOKEN_TOTALS[trustStage - 1];
+  // Compute retrieved token totals for adjacent stages to show delta
+  const prev = trustStage > 0
+    ? getContextSources((trustStage - 1) as TrustStage).reduce((s, c) => s + c.tokens, 0)
+    : 0;
+  const curr = getContextSources(trustStage).reduce((s, c) => s + c.tokens, 0);
+  return curr - prev;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   format,
   addWeeks,
@@ -15,6 +15,7 @@ import {
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCalendar } from "@/components/providers/calendar-provider";
+import { useDemo } from "@/components/demo/demo-provider";
 import type { CalendarView } from "@/lib/calendar/utils";
 import type { CalendarEvent } from "@/lib/calendar/data";
 import { WeekView } from "./week-view";
@@ -38,6 +39,7 @@ const VIEWS: { value: CalendarView; label: string }[] = [
 
 export function CalendarShell() {
   const { currentDate, setCurrentDate, view, setView } = useCalendar();
+  const { mode, currentStep } = useDemo();
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(
     null
   );
@@ -46,6 +48,18 @@ export function CalendarShell() {
     date: Date;
     hour: number;
   } | null>(null);
+
+  // Sync calendar view from tour steps
+  const prevViewRef = useRef<CalendarView | null>(null);
+  useEffect(() => {
+    if (mode === "tour" && currentStep.calendarView) {
+      if (!prevViewRef.current) prevViewRef.current = view;
+      setView(currentStep.calendarView);
+    } else if (mode === "tour" && !currentStep.calendarView && prevViewRef.current) {
+      setView(prevViewRef.current);
+      prevViewRef.current = null;
+    }
+  }, [mode, currentStep, setView]);
 
   const navigate = (direction: "prev" | "next") => {
     const fn = direction === "next" ? 1 : -1;

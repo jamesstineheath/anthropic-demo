@@ -2,13 +2,14 @@
 
 import { format, isToday, getHours, getMinutes } from "date-fns";
 import { useCalendar } from "@/components/providers/calendar-provider";
+import { useDemo } from "@/components/demo/demo-provider";
 import { getEventsForDay, HOURS } from "@/lib/calendar/utils";
 import {
   getEventColors,
   type CalendarEvent,
 } from "@/lib/calendar/data";
 import { cn } from "@/lib/utils";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 interface TimeGridProps {
   days: Date[];
@@ -40,8 +41,20 @@ function CurrentTimeLine() {
   );
 }
 
+/** Check if an event title matches any of the highlight patterns (substring match) */
+function isHighlighted(title: string, patterns: string[] | undefined): boolean {
+  if (!patterns || patterns.length === 0) return false;
+  const lower = title.toLowerCase();
+  return patterns.some((p) => lower.includes(p.toLowerCase()));
+}
+
 export function TimeGrid({ days, onEventClick, onSlotClick }: TimeGridProps) {
   const { events } = useCalendar();
+  const { mode, currentStep } = useDemo();
+
+  // Only highlight during tour mode
+  const highlightPatterns = mode === "tour" ? currentStep.highlightEvents : undefined;
+  const hasHighlights = !!highlightPatterns && highlightPatterns.length > 0;
 
   return (
     <div className="flex flex-1 overflow-hidden">
@@ -157,30 +170,37 @@ export function TimeGrid({ days, onEventClick, onSlotClick }: TimeGridProps) {
                     const colors = getEventColors(event);
                     const widthPct = 100 / totalCols;
                     const leftPct = colIndex * widthPct;
+                    const highlighted = isHighlighted(event.title, highlightPatterns);
+                    // When highlights are active, dim non-highlighted events
+                    const dimmed = hasHighlights && !highlighted;
 
                     return (
                       <div
                         key={event.id}
                         className={cn(
-                          "absolute pointer-events-auto cursor-pointer rounded px-1.5 py-0.5 leading-snug overflow-hidden hover:brightness-95 transition-all",
+                          "absolute pointer-events-auto cursor-pointer rounded border px-1.5 py-0.5 leading-snug overflow-hidden hover:brightness-95 transition-all duration-500",
                           colors.bg,
                           colors.text,
+                          colors.border,
                           colors.darkBg,
                           colors.darkText,
-                          event.isConflict && "ring-2 ring-red-500/60"
+                          event.isConflict && "ring-2 ring-red-500/60",
+                          highlighted && "z-10 brightness-105 shadow-lg border-transparent",
+                          dimmed && "opacity-30 saturate-50"
                         )}
                         style={{
                           top: `${(topPx / TOTAL_PX) * 100}%`,
                           height: `${(heightPx / TOTAL_PX) * 100}%`,
                           left: `calc(${leftPct}% + 1px)`,
                           width: `calc(${widthPct}% - 2px)`,
+                          ...(highlighted ? { boxShadow: "0 0 12px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.06)" } : {}),
                         }}
                         onClick={(e) => {
                           e.stopPropagation();
                           onEventClick(event);
                         }}
                       >
-                        <div className="font-medium truncate text-xs leading-tight">{event.title}</div>
+                        <div className="font-medium text-xs leading-tight line-clamp-3">{event.title}</div>
                       </div>
                     );
                   });

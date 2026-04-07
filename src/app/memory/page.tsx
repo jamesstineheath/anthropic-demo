@@ -125,8 +125,9 @@ export default function MemoryPage() {
         </>
       )}
 
-      {/* Detail modal */}
+      {/* Detail modal — non-modal so sidebar remains interactive */}
       <Dialog
+        modal={false}
         open={!!selectedMemoryId}
         onOpenChange={(open) => {
           if (!open) setSelectedMemoryId(null);
