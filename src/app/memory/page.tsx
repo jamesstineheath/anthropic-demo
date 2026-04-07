@@ -135,6 +135,7 @@ export default function MemoryPage() {
       >
         <DialogContent
           showCloseButton={false}
+          showOverlay={false}
           className="sm:max-w-lg max-h-[85vh] p-0 overflow-hidden flex flex-col"
         >
           {selectedMemoryId && (
