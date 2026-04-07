@@ -125,9 +125,8 @@ export default function MemoryPage() {
         </>
       )}
 
-      {/* Detail modal — non-modal so sidebar remains interactive */}
+      {/* Detail modal */}
       <Dialog
-        modal={false}
         open={!!selectedMemoryId}
         onOpenChange={(open) => {
           if (!open) setSelectedMemoryId(null);
@@ -135,7 +134,6 @@ export default function MemoryPage() {
       >
         <DialogContent
           showCloseButton={false}
-          showOverlay={false}
           className="sm:max-w-lg max-h-[85vh] p-0 overflow-hidden flex flex-col"
         >
           {selectedMemoryId && (

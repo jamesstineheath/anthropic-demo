@@ -15,7 +15,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen overflow-hidden bg-background">
       {/* Desktop sidebar */}
-      <aside className="hidden w-[260px] shrink-0 border-r border-border bg-sidebar md:block">
+      <aside className="hidden w-[260px] shrink-0 border-r border-border bg-sidebar md:block relative z-[60]">
         <Sidebar />
       </aside>
 
