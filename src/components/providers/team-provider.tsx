@@ -1,12 +1,20 @@
 "use client";
 
 import * as React from "react";
+import type { TrustStage } from "@/lib/agents/data";
+
+interface TeamAgent {
+  id: string;
+  trustStage: TrustStage;
+}
 
 interface TeamContextValue {
-  teamAgentIds: string[];
+  teamAgents: TeamAgent[];
   addAgent: (id: string) => void;
   removeAgent: (id: string) => void;
   isOnTeam: (id: string) => boolean;
+  getTrustStage: (id: string) => TrustStage;
+  setTrustStage: (id: string, stage: TrustStage) => void;
   mounted: boolean;
 }
 
@@ -15,48 +23,80 @@ const TeamContext = React.createContext<TeamContextValue | undefined>(undefined)
 const STORAGE_KEY = "claude-agents-team";
 
 export function TeamProvider({ children }: { children: React.ReactNode }) {
-  const [teamAgentIds, setTeamAgentIds] = React.useState<string[]>([]);
+  const [teamAgents, setTeamAgents] = React.useState<TeamAgent[]>([]);
   const [mounted, setMounted] = React.useState(false);
 
-  // Hydrate from localStorage on mount
   React.useEffect(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed)) {
-          setTeamAgentIds(parsed);
+          // Handle legacy format (string[]) and new format (TeamAgent[])
+          const agents = parsed.map((item: string | TeamAgent) =>
+            typeof item === "string" ? { id: item, trustStage: 0 as TrustStage } : item
+          );
+          setTeamAgents(agents);
         }
       }
     } catch {
-      // Ignore parse errors
+      // Ignore
     }
     setMounted(true);
   }, []);
 
-  // Persist to localStorage on change (skip initial mount)
   React.useEffect(() => {
     if (mounted) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(teamAgentIds));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(teamAgents));
     }
-  }, [teamAgentIds, mounted]);
+  }, [teamAgents, mounted]);
 
   const addAgent = React.useCallback((id: string) => {
-    setTeamAgentIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
+    setTeamAgents((prev) =>
+      prev.some((a) => a.id === id)
+        ? prev
+        : [...prev, { id, trustStage: 0 as TrustStage }]
+    );
   }, []);
 
   const removeAgent = React.useCallback((id: string) => {
-    setTeamAgentIds((prev) => prev.filter((agentId) => agentId !== id));
+    setTeamAgents((prev) => prev.filter((a) => a.id !== id));
   }, []);
 
   const isOnTeam = React.useCallback(
-    (id: string) => teamAgentIds.includes(id),
-    [teamAgentIds]
+    (id: string) => teamAgents.some((a) => a.id === id),
+    [teamAgents]
   );
 
+  const getTrustStage = React.useCallback(
+    (id: string): TrustStage => {
+      const agent = teamAgents.find((a) => a.id === id);
+      return (agent?.trustStage ?? 0) as TrustStage;
+    },
+    [teamAgents]
+  );
+
+  const setTrustStage = React.useCallback(
+    (id: string, stage: TrustStage) => {
+      setTeamAgents((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, trustStage: stage } : a))
+      );
+    },
+    []
+  );
+
+  // Backward-compatible teamAgentIds
   return (
     <TeamContext.Provider
-      value={{ teamAgentIds, addAgent, removeAgent, isOnTeam, mounted }}
+      value={{
+        teamAgents,
+        addAgent,
+        removeAgent,
+        isOnTeam,
+        getTrustStage,
+        setTrustStage,
+        mounted,
+      }}
     >
       {children}
     </TeamContext.Provider>

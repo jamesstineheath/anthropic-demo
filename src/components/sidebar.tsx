@@ -1,77 +1,149 @@
 "use client";
 
 import { Suspense } from "react";
-import { Sparkles, Lock } from "lucide-react";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+import {
+  Sparkles,
+  Lock,
+  Plus,
+  Search,
+  ArrowLeft,
+} from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { SidebarNav } from "@/components/sidebar-nav";
 import { CategoryNav } from "@/components/category-nav";
 import { TeamList } from "@/components/team-list";
 import { META_AGENTS, getAgentById } from "@/lib/agents/data";
 import { getIcon } from "@/lib/icons";
-import { Badge } from "@/components/ui/badge";
 
 export function Sidebar() {
+  const pathname = usePathname();
+  const isAgentDetail = pathname.startsWith("/agents/");
+  const agentId = isAgentDetail ? pathname.split("/agents/")[1] : null;
+  const activeAgent = agentId ? getAgentById(agentId) : null;
+
   return (
     <ScrollArea className="h-full">
-      <div className="flex h-full flex-col px-4 py-6">
-        {/* Logo */}
-        <div className="mb-6 flex items-center gap-2 px-3">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Sparkles className="h-3.5 w-3.5" />
+      <div className="flex h-full min-h-screen flex-col">
+        {/* Header: Claude wordmark */}
+        <div className="px-4 pt-4 pb-2">
+          <div className="flex items-center gap-2 px-2">
+            <Sparkles className="h-4 w-4 text-primary" />
+            <span className="text-[15px] font-semibold tracking-tight">
+              Claude
+            </span>
           </div>
-          <span className="text-base font-semibold tracking-tight">
-            Claude Agents
-          </span>
         </div>
 
-        {/* Categories */}
-        <div className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-          Categories
+        {/* Decorative action buttons */}
+        <div className="px-4 py-1 space-y-0.5">
+          <div className="flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-[13px] text-muted-foreground/40 cursor-default">
+            <Plus className="h-4 w-4" />
+            <span>New chat</span>
+          </div>
+          <div className="flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-[13px] text-muted-foreground/40 cursor-default">
+            <Search className="h-4 w-4" />
+            <span>Search</span>
+          </div>
         </div>
-        <Suspense>
-          <CategoryNav />
-        </Suspense>
 
-        <Separator className="my-4" />
+        <Separator className="mx-4 my-2" />
 
-        {/* Your Team */}
-        <div className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-          Your Team
+        {/* Main navigation */}
+        <div className="px-4">
+          <SidebarNav />
         </div>
-        <TeamList />
 
-        <Separator className="my-4" />
+        <Separator className="mx-4 my-2" />
 
-        {/* Meta Agents Preview */}
-        <div className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-          Meta Agents
-        </div>
-        <div className="space-y-1">
-          {META_AGENTS.map((agent) => {
-            const Icon = getIcon(agent.icon);
-            return (
-              <div
-                key={agent.id}
-                className="flex items-center gap-2.5 rounded-lg px-3 py-2 opacity-50"
+        {/* Contextual content */}
+        <div className="flex-1 px-4">
+          {isAgentDetail && activeAgent ? (
+            // Agent detail sidebar
+            <div className="space-y-1">
+              <Link
+                href="/"
+                className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[12px] text-muted-foreground transition-colors hover:text-foreground"
               >
-                <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
-                <span className="truncate text-sm text-muted-foreground">
-                  {agent.name}
+                <ArrowLeft className="h-3 w-3" />
+                Agent Team
+              </Link>
+              <div className="flex items-center gap-2.5 px-3 py-2">
+                {(() => {
+                  const Icon = getIcon(activeAgent.icon);
+                  return (
+                    <Icon className="h-4 w-4 text-primary" />
+                  );
+                })()}
+                <span className="text-sm font-medium">
+                  {activeAgent.name}
                 </span>
-                <Lock className="ml-auto h-3 w-3 shrink-0 text-muted-foreground/50" />
               </div>
-            );
-          })}
+            </div>
+          ) : (
+            // Agent Team sidebar content
+            <>
+              {/* Categories */}
+              <div className="mb-1.5 px-3 pt-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+                Categories
+              </div>
+              <Suspense>
+                <CategoryNav />
+              </Suspense>
+
+              <Separator className="my-3" />
+
+              {/* Your Team */}
+              <div className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+                Your Team
+              </div>
+              <TeamList />
+
+              <Separator className="my-3" />
+
+              {/* Meta Agents */}
+              <div className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+                Meta Agents
+              </div>
+              <div className="space-y-0.5">
+                {META_AGENTS.map((agent) => {
+                  const Icon = getIcon(agent.icon);
+                  return (
+                    <div
+                      key={agent.id}
+                      className="flex items-center gap-2.5 rounded-lg px-3 py-1.5 opacity-40"
+                    >
+                      <Icon className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                      <span className="truncate text-[13px] text-muted-foreground">
+                        {agent.name}
+                      </span>
+                      <Lock className="ml-auto h-3 w-3 shrink-0 text-muted-foreground/40" />
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
         </div>
 
-        {/* Spacer */}
-        <div className="flex-1" />
-
-        {/* Footer */}
-        <div className="mt-6 px-3">
-          <p className="text-[10px] text-muted-foreground/50">
-            Prototype — Anthropic PM Take-Home
-          </p>
+        {/* User profile (simulated) */}
+        <div className="mt-auto border-t border-border px-4 py-3">
+          <div className="flex items-center gap-2.5 px-2">
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/20 text-[11px] font-semibold text-primary">
+              J
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-[13px] font-medium leading-tight">James</div>
+              <div className="text-[10px] text-muted-foreground">Max plan</div>
+            </div>
+          </div>
+          <div className="mt-2 px-2">
+            <p className="text-[9px] text-muted-foreground/40">
+              Prototype — Anthropic PM Take-Home
+            </p>
+          </div>
         </div>
       </div>
     </ScrollArea>

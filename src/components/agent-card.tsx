@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Plus, Check, Sparkles } from "lucide-react";
+import { Plus, Sparkles } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,38 +12,46 @@ import { cn } from "@/lib/utils";
 
 interface AgentCardProps {
   agent: Agent;
+  featured?: boolean;
 }
 
-export function AgentCard({ agent }: AgentCardProps) {
-  const { isOnTeam, addAgent, removeAgent } = useTeam();
+export function AgentCard({ agent, featured }: AgentCardProps) {
+  const { isOnTeam, addAgent, removeAgent, getTrustStage } = useTeam();
   const onTeam = isOnTeam(agent.id);
+  const trustStage = getTrustStage(agent.id);
   const Icon = getIcon(agent.icon);
 
   const cardContent = (
     <Card
       className={cn(
         "group relative border transition-all duration-200",
+        featured && "ring-1 ring-primary/20",
         onTeam
           ? "border-primary/20 bg-card shadow-sm"
           : "border-border bg-card hover:border-primary/30 hover:shadow-sm"
       )}
     >
-      <CardContent className="p-5">
-        {/* Header: Icon + Name */}
+      <CardContent className={cn("p-5", featured && "p-6")}>
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
             <div
               className={cn(
-                "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
+                "flex shrink-0 items-center justify-center rounded-xl",
+                featured ? "h-12 w-12" : "h-10 w-10",
                 onTeam
                   ? "bg-primary/10 text-primary"
                   : "bg-secondary text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
               )}
             >
-              <Icon className="h-5 w-5" />
+              <Icon className={cn(featured ? "h-6 w-6" : "h-5 w-5")} />
             </div>
             <div>
-              <h3 className="text-sm font-semibold leading-tight text-foreground">
+              <h3
+                className={cn(
+                  "font-semibold leading-tight text-foreground",
+                  featured ? "text-base" : "text-sm"
+                )}
+              >
                 {agent.name}
               </h3>
               {agent.isDeepAgent && (
@@ -56,29 +64,29 @@ export function AgentCard({ agent }: AgentCardProps) {
           </div>
         </div>
 
-        {/* Description */}
-        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+        <p
+          className={cn(
+            "mt-3 leading-relaxed text-muted-foreground",
+            featured ? "text-sm" : "text-[13px]"
+          )}
+        >
           {agent.description}
         </p>
 
-        {/* Footer: Category + Action */}
         <div className="mt-4 flex items-center justify-between gap-2">
-          <Badge
-            variant="secondary"
-            className="text-[10px] font-medium"
-          >
+          <Badge variant="secondary" className="text-[10px] font-medium">
             {agent.category}
           </Badge>
 
           {onTeam ? (
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-medium text-primary">
-                Stage {agent.trustStage}: {TRUST_STAGE_LABELS[agent.trustStage]}
+                Stage {trustStage}: {TRUST_STAGE_LABELS[trustStage]}
               </span>
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-7 px-2 text-xs text-muted-foreground hover:text-destructive"
+                className="h-6 px-2 text-[11px] text-muted-foreground hover:text-destructive"
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
