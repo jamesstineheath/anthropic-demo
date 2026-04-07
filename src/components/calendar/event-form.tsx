@@ -118,7 +118,7 @@ export function EventForm({
             type="button"
             onClick={() => setCategory(cat.value)}
             className={cn(
-              "rounded-full px-2.5 py-1 text-[10px] font-medium border transition-colors",
+              "rounded-full px-2.5 py-1 text-xs font-medium border transition-colors",
               category === cat.value
                 ? "border-primary bg-primary/10 text-primary"
                 : "border-border text-muted-foreground hover:border-primary/30"

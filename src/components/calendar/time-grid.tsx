@@ -181,12 +181,7 @@ export function TimeGrid({ days, onEventClick, onSlotClick }: TimeGridProps) {
                           onEventClick(event);
                         }}
                       >
-                        <div className="font-medium truncate text-[13px]">{event.title}</div>
-                        {heightPx >= 44 && (
-                          <div className="opacity-70 truncate text-[11px] mt-0.5">
-                            {format(event.start, "h:mm a")}
-                          </div>
-                        )}
+                        <div className="font-medium truncate text-sm leading-tight">{event.title}</div>
                       </div>
                     );
                   });

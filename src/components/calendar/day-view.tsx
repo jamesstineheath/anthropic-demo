@@ -20,7 +20,7 @@ export function DayView({ onEventClick, onSlotClick }: DayViewProps) {
       <div className="flex shrink-0 border-b border-border">
         <div className="w-14 shrink-0" />
         <div className="flex-1 px-2 py-2 text-center">
-          <div className="text-[10px] uppercase text-muted-foreground">
+          <div className="text-xs uppercase text-muted-foreground">
             {format(currentDate, "EEEE")}
           </div>
           <div

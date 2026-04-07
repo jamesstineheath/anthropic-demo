@@ -52,7 +52,7 @@ export const AGENTS: Agent[] = [
   // ── Daily Life ──────────────────────────────────────────────
   {
     id: "calendaring",
-    name: "Calendaring",
+    name: "Calendar",
     category: "Daily Life",
     description:
       "Manages your schedule intelligently, learning your priorities and preferences to protect your time.",

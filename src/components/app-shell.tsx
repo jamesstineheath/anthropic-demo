@@ -3,15 +3,15 @@
 import { usePathname } from "next/navigation";
 import { Sidebar } from "@/components/sidebar";
 import { SidebarMobile } from "@/components/sidebar-mobile";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { XRayToggle } from "@/components/xray-toggle";
-import { TourOverlay } from "@/components/tour/tour-overlay";
-import { useTour } from "@/components/providers/tour-provider";
+import { DemoController } from "@/components/demo/demo-controller";
+import { DemoOverlay } from "@/components/demo/demo-overlay";
+import { OnboardingOverlay } from "@/components/demo/onboarding-overlay";
+import { MobileGate } from "@/components/mobile-gate";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAgentDetail = pathname.startsWith("/agents/");
-  const { startTour } = useTour();
+  const isFullWidth = isAgentDetail || pathname === "/memory";
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
@@ -27,31 +27,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-2">
             <SidebarMobile />
           </div>
-          <div className="flex items-center gap-1">
-            <button
-              onClick={startTour}
-              className="px-2 py-1 text-xs text-muted-foreground hover:text-foreground transition-colors rounded"
-            >
-              Tour
-            </button>
-            <XRayToggle />
-            <ThemeToggle />
-          </div>
+          <div className="flex items-center gap-1" />
         </header>
 
         {/* Content */}
         <main className="flex-1 overflow-y-auto">
-          {isAgentDetail ? (
-            // Full-width for agent detail pages
-            <div className="h-full">{children}</div>
-          ) : (
-            // Constrained width for marketplace
-            <div className="mx-auto max-w-5xl px-6 py-6">{children}</div>
-          )}
+          <div className="h-full">{children}</div>
         </main>
       </div>
 
-      <TourOverlay />
+      <OnboardingOverlay />
+      <DemoOverlay />
+      <DemoController />
+      <MobileGate />
     </div>
   );
 }

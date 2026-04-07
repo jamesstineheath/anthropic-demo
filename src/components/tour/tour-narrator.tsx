@@ -55,7 +55,7 @@ export function TourNarrator({
       )}
     >
       {/* Claude orange accent bar */}
-      <div className="h-1 w-8 rounded-full bg-[#d97757] mb-4" />
+      <div className="h-1 w-8 rounded-full bg-zinc-900 mb-4" />
 
       <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-3 leading-tight">
         {title}
@@ -84,7 +84,7 @@ export function TourNarrator({
         <div className="flex flex-col gap-2">
           <button
             onClick={onEndTour}
-            className="w-full px-4 py-2.5 text-sm font-semibold bg-[#d97757] text-white rounded-lg hover:bg-[#c4684b] transition-colors"
+            className="w-full px-4 py-2.5 text-sm font-semibold bg-zinc-900 text-white rounded-lg hover:bg-zinc-800 transition-colors"
           >
             Explore the Demo
           </button>
@@ -113,7 +113,7 @@ export function TourNarrator({
             {!waitingForAction && !quickReplies?.length && (
               <button
                 onClick={onNext}
-                className="flex items-center gap-1 px-4 py-2 text-sm font-semibold bg-[#d97757] text-white rounded-lg hover:bg-[#c4684b] transition-colors"
+                className="flex items-center gap-1 px-4 py-2 text-sm font-semibold bg-zinc-900 text-white rounded-lg hover:bg-zinc-800 transition-colors"
               >
                 Next
                 <ChevronRight className="h-3.5 w-3.5" />

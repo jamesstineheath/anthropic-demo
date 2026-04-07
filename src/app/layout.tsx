@@ -1,16 +1,17 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Source_Serif_4, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { TeamProvider } from "@/components/providers/team-provider";
 import { XRayProvider } from "@/components/providers/xray-provider";
 import { TourProvider } from "@/components/providers/tour-provider";
+import { DemoProvider } from "@/components/demo/demo-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppShell } from "@/components/app-shell";
 
-// Inter: clean humanist sans used across Anthropic's products (console, docs)
-const inter = Inter({
+// Source Serif 4: warm transitional serif approximating Claude.ai's typography
+const sourceSerif = Source_Serif_4({
   variable: "--font-geist-sans",
   subsets: ["latin"],
   display: "swap",
@@ -38,16 +39,18 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`${sourceSerif.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="h-full">
         <ThemeProvider>
           <TeamProvider>
             <XRayProvider>
               <TourProvider>
-                <TooltipProvider>
-                  <AppShell>{children}</AppShell>
-                </TooltipProvider>
+                <DemoProvider>
+                  <TooltipProvider>
+                    <AppShell>{children}</AppShell>
+                  </TooltipProvider>
+                </DemoProvider>
               </TourProvider>
             </XRayProvider>
           </TeamProvider>

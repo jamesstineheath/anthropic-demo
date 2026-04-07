@@ -1,14 +1,23 @@
+export interface ToolCallScript {
+  name: string;
+  status: "running" | "complete";
+  detail?: string;
+}
+
 export interface ScriptedMessage {
   id: string;
   role: "agent";
   content: string;
   quickReplies?: string[];
   delayMs: number;
+  toolCalls?: ToolCallScript[];
+  savingMemory?: boolean;
 }
 
 export interface ScriptStep {
   agentMessage: ScriptedMessage;
   responseKey: string; // key for storing the user's answer
+  autoAdvance?: boolean; // if true, advance to next step without waiting for user input
 }
 
 export const ONBOARDING_SCRIPT: ScriptStep[] = [
@@ -17,24 +26,55 @@ export const ONBOARDING_SCRIPT: ScriptStep[] = [
       id: "onboard-0",
       role: "agent",
       content:
-        "Hi! I'm your Calendaring agent. Right now I can help with general scheduling questions and time management tips. As I learn about you, I'll unlock more personalized capabilities.\n\nLet's start with a few quick questions.",
+        "Hi! I'm your Calendar agent. I can help manage your schedule, flag conflicts, and protect your time — but first I need to see your calendar.\n\nDo you have a Google Calendar you'd like to connect?",
+      quickReplies: ["Yes, connect my Google Calendar", "Not right now"],
       delayMs: 800,
     },
-    responseKey: "__intro__",
+    responseKey: "__connect__",
   },
   {
     agentMessage: {
       id: "onboard-1",
       role: "agent",
-      content: "Are you more of a morning person or a night owl?",
-      quickReplies: ["Night owl", "Morning person", "It depends"],
+      content:
+        "Connected! I can see **7 calendars** across your account. Let me take a look at what's there...",
+      toolCalls: [
+        { name: "google_calendar.list_calendars", status: "complete" },
+        { name: "google_calendar.list_events", status: "complete", detail: "next 14 days" },
+        { name: "analyze_schedule_patterns", status: "complete" },
+      ],
+      delayMs: 1800,
+    },
+    responseKey: "__analysis__",
+    autoAdvance: true,
+  },
+  {
+    agentMessage: {
+      id: "onboard-2",
+      role: "agent",
+      content:
+        "Here's what I found:\n\n• **23 events** this week across work, personal, and family calendars\n• **2 scheduling conflicts** (Wednesday and Thursday overlap)\n• You seem to keep Wed/Fri mornings lighter — are those work-from-home days?\n• Evenings 5-7:30pm are consistently blocked — looks like family time\n\nDoes that look right? Are Wed/Fri your home days?",
+      quickReplies: ["Yes, that's right", "Mostly — let me clarify"],
+      savingMemory: true,
+      delayMs: 600,
+    },
+    responseKey: "schedulePattern",
+  },
+  {
+    agentMessage: {
+      id: "onboard-3",
+      role: "agent",
+      content:
+        "Good to know. A couple more things that will help me prioritize for you:\n\nAre you more of a morning person or a night owl?",
+      quickReplies: ["Morning person", "Night owl", "It depends"],
+      savingMemory: true,
       delayMs: 600,
     },
     responseKey: "chronotype",
   },
   {
     agentMessage: {
-      id: "onboard-2",
+      id: "onboard-4",
       role: "agent",
       content:
         "Do you prefer meetings clustered together or spread throughout the day?",
@@ -45,33 +85,40 @@ export const ONBOARDING_SCRIPT: ScriptStep[] = [
   },
   {
     agentMessage: {
-      id: "onboard-3",
+      id: "onboard-5",
       role: "agent",
-      content: "Any days or times that should always stay free?",
-      quickReplies: [
-        "5-7:30pm (kids)",
-        "Wed/Fri mornings",
-        "Both of those",
-        "Let me type...",
-      ],
-      delayMs: 600,
-    },
-    responseKey: "protectedTime",
-  },
-  {
-    agentMessage: {
-      id: "onboard-4",
-      role: "agent",
-      content: "What's your biggest scheduling frustration?",
+      content: "What's your biggest scheduling frustration right now?",
       quickReplies: [
         "Childcare coordination",
         "Too many calendars",
-        "Both of those",
+        "Back-to-back meetings",
         "Let me type...",
       ],
       delayMs: 600,
     },
     responseKey: "frustration",
+  },
+  {
+    agentMessage: {
+      id: "onboard-6",
+      role: "agent",
+      content:
+        "Thanks — that's really helpful. Before we get started, here's how I work:\n\nI operate on a **progressive trust model**. Right now I'm starting at Stage 0 — I can answer questions but I won't take any actions without asking. As you interact with me and I prove I understand your preferences, I'll gradually unlock more capabilities:\n\n**Stage 1** — General Assistant: answer questions, flag conflicts\n**Stage 2** — Personal Advisor: learn your energy patterns, suggest optimizations\n**Stage 3** — Active Analyst: schedule health scores, cross-calendar reasoning\n**Stage 4** — Proactive Partner: protect focus time, auto-decline low-value meetings\n**Stage 5** — Trusted Delegate: autonomous scheduling, burnout detection\n\nYou're always in control — you can roll back my trust level at any time.",
+      quickReplies: ["Makes sense, let's go", "Tell me more"],
+      delayMs: 800,
+    },
+    responseKey: "__trust_model__",
+  },
+  {
+    agentMessage: {
+      id: "onboard-7",
+      role: "agent",
+      content:
+        "One more thing — **shared memory and privacy**.\n\nAs I learn about you, I save preferences and patterns to a shared memory that other agents on your team can read. For example, if you tell me you're a night owl, your Email Drafter agent can use that to schedule send times.\n\nYou have full control:\n\n• You can **view everything** I've stored in the Memory tab\n• You can **edit or delete** any memory at any time\n• Each agent only sees memory **relevant to its job** — your Grocery Shopper doesn't need your meeting preferences\n• Nothing is shared outside your account\n\nI'll always tell you when I'm saving something new to memory.",
+      quickReplies: ["Got it, let's go", "I have questions about this"],
+      delayMs: 800,
+    },
+    responseKey: "__privacy__",
   },
 ];
 
@@ -79,7 +126,11 @@ export const ONBOARDING_COMPLETE_MESSAGE: ScriptedMessage = {
   id: "onboard-complete",
   role: "agent",
   content:
-    "Got it — I've already learned a few things about you. I'm now at **Stage 1: General Assistant**. I can answer questions about your schedule and share observations.\n\nTry asking me about your week, or I'll point out things I've noticed.",
+    "I've saved your preferences and analyzed your calendar patterns. I'm now at **Stage 1: General Assistant**.\n\nI can answer questions about your schedule, flag conflicts, and share observations. Try asking me about your week or upcoming conflicts.",
+  toolCalls: [
+    { name: "memory.save", status: "complete", detail: "6 preferences saved" },
+  ],
+  savingMemory: true,
   delayMs: 1000,
 };
 
@@ -183,23 +234,23 @@ export const STAGE_3_RESPONSES: Stage1Response[] = [
   {
     triggers: ["health", "score", "how am i", "balance", "overview", "status"],
     content:
-      "Schedule health: **62/100** (down from 71 last week).\n\nBreakdown:\n• **Meeting load** is normal (18 hrs, your average)\n• **Personal time** is compressed — you're solo parenting Mon-Wed with Allegra traveling, which means zero buffer\n• **Focus blocks** — none longer than 90 min this week\n• **Dog walks** are happening (good sign), but you skipped your usual Friday afternoon downtime last week\n\nBiggest risk: Tuesday is your anniversary and your densest meeting day. If anything runs long, your evening is gone.",
+      "Schedule health: **62/100** (down from 71 last week).\n\nBreakdown:\n• **Meeting load** is normal (18 hrs, your average)\n• **Personal time** is compressed — you're solo parenting Mon-Wed with Sarah traveling, which means zero buffer\n• **Focus blocks** — none longer than 90 min this week\n• **Dog walks** are happening (good sign), but you skipped your usual Friday afternoon downtime last week\n\nBiggest risk: Tuesday is your anniversary and your densest meeting day. If anything runs long, your evening is gone.",
     confidence: "medium",
     confidenceReason:
-      "Cross-calendar synthesis: work (18 hrs meetings), Heath Fam (Allegra traveling), Maddie (normal hours), personal (dog walks 4/5)",
+      "Cross-calendar synthesis: work (18 hrs meetings), Chen Fam (Sarah traveling), Maddie (normal hours), personal (dog walks 4/5)",
   },
   {
     triggers: ["conflict", "tuesday", "strategy", "product strategy", "reschedule", "move", "anniversary"],
     content:
-      "You just got a meeting request for Tuesday 6:30-7:30pm: \"Product Strategy Review\" from Azita, marked urgent. I'd push back. Here's why:\n\n1. Tuesday is your anniversary (Heath Fam calendar)\n2. Dad mode starts at 5pm — you're solo parenting this week\n3. Even if you could attend, you'd miss bath time and dinner\n\nI can suggest Thursday 11am instead — you have a gap between Lena's 1:1 and your afternoon meetings, and Azita is free then too.\n\nWant me to propose the reschedule?",
+      "You just got a meeting request for Tuesday 6:30-7:30pm: \"Product Strategy Review\" from Azita, marked urgent. I'd push back. Here's why:\n\n1. Tuesday is your anniversary (Chen Fam calendar)\n2. Dad mode starts at 5pm — you're solo parenting this week\n3. Even if you could attend, you'd miss bath time and dinner\n\nI can suggest Thursday 11am instead — you have a gap between Lena's 1:1 and your afternoon meetings, and Azita is free then too.\n\nWant me to propose the reschedule?",
     confidence: "high",
     confidenceReason:
-      "Confidence 95%: Anniversary (Tier 1), Dad mode (hard constraint), solo parenting (Allegra traveling). Alternative slot verified across 2 calendars.",
+      "Confidence 95%: Anniversary (Tier 1), Dad mode (hard constraint), solo parenting (Sarah traveling). Alternative slot verified across 2 calendars.",
   },
   {
     triggers: ["meeting", "meetings", "too many", "load", "hours"],
     content:
-      "Meeting load analysis for this week:\n\n• **Total:** 18 hrs across 22 meetings\n• **Your sustainable range:** 18-22 hrs (you're at the low end — good)\n• **Distribution:** Mon 4hrs, Tue 5hrs, Wed 2hrs, Thu 4hrs, Fri 3hrs\n• **Back-to-back chains:** Tuesday has 3 meetings in a row (10:30am-1pm)\n\nCompared to your 4-week average, this is a typical week. But with Allegra traveling Mon-Wed, your personal load is higher than usual.\n\nI'm watching 3 meetings you've declined 5+ times — want me to start auto-declining those at Stage 4?",
+      "Meeting load analysis for this week:\n\n• **Total:** 18 hrs across 22 meetings\n• **Your sustainable range:** 18-22 hrs (you're at the low end — good)\n• **Distribution:** Mon 4hrs, Tue 5hrs, Wed 2hrs, Thu 4hrs, Fri 3hrs\n• **Back-to-back chains:** Tuesday has 3 meetings in a row (10:30am-1pm)\n\nCompared to your 4-week average, this is a typical week. But with Sarah traveling Mon-Wed, your personal load is higher than usual.\n\nI'm watching 3 meetings you've declined 5+ times — want me to start auto-declining those at Stage 4?",
     confidence: "high",
     confidenceReason:
       "Meeting data from 4 weeks of calendar history. Decline patterns tracked across 8 weeks.",
@@ -230,15 +281,15 @@ export const STAGE_4_RESPONSES: Stage1Response[] = [
   {
     triggers: ["anniversary", "declined", "azita", "handled", "what did you do", "personal"],
     content:
-      "I declined the Product Strategy Review on your behalf. Here's what I sent to Azita:\n\n> \"James has a personal commitment Tuesday evening that he can't move. He's available Thursday 11am-12pm if that works for the team, or he can review materials async Wednesday and send comments by EOD.\"\n\nI also blocked 5:30-9:00pm on your work calendar as \"Personal — Anniversary\" so nothing else lands there. Allegra's back Wednesday night, so Thursday onward your evenings are shared again.\n\nHappy anniversary, by the way.",
+      "I declined the Product Strategy Review on your behalf. Here's what I sent to Azita:\n\n> \"Alex has a personal commitment Tuesday evening that he can't move. He's available Thursday 11am-12pm if that works for the team, or he can review materials async Wednesday and send comments by EOD.\"\n\nI also blocked 5:30-9:00pm on your work calendar as \"Personal — Anniversary\" so nothing else lands there. Sarah's back Wednesday night, so Thursday onward your evenings are shared again.\n\nHappy anniversary, by the way.",
     confidence: "high",
     confidenceReason:
-      "Autonomous action within approved rules. Relationship tier: Allegra = T1, Azita = T3. Decision: Partner > Work (unless emergency). Confidence: 97%.",
+      "Autonomous action within approved rules. Relationship tier: Sarah = T1, Azita = T3. Decision: Partner > Work (unless emergency). Confidence: 97%.",
   },
   {
     triggers: ["schedule", "week", "this week", "what's on", "calendar"],
     content:
-      "Your week at a glance — filtered through what I know about your priorities:\n\n**Protected:** Dad mode 5-7:30pm daily ✅, Wed morning focus ✅, Fri morning focus ✅\n**Flagged:** Tuesday is your anniversary — I've blocked the evening. Solo parenting Mon-Wed (Allegra in San Diego).\n**Auto-declined:** SW+XFN Weekly (Mon), Charcoal Supply/Demand (Tue) — per your decline patterns.\n**Action needed:** Product Strategy Review conflict on Tuesday evening — [resolved, declined with alternative].\n\nYour schedule health is trending up from 62 to 68 after the auto-declines.",
+      "Your week at a glance — filtered through what I know about your priorities:\n\n**Protected:** Dad mode 5-7:30pm daily ✅, Wed morning focus ✅, Fri morning focus ✅\n**Flagged:** Tuesday is your anniversary — I've blocked the evening. Solo parenting Mon-Wed (Sarah in San Diego).\n**Auto-declined:** SW+XFN Weekly (Mon), Charcoal Supply/Demand (Tue) — per your decline patterns.\n**Action needed:** Product Strategy Review conflict on Tuesday evening — [resolved, declined with alternative].\n\nYour schedule health is trending up from 62 to 68 after the auto-declines.",
     confidence: "high",
     confidenceReason:
       "Full calendar synthesis + approved auto-decline rules + relationship tier framework active.",
@@ -269,15 +320,15 @@ export const STAGE_5_RESPONSES: Stage1Response[] = [
   {
     triggers: ["burnout", "stressed", "exhausted", "overwhelmed", "patterns", "signals", "worried", "tired"],
     content:
-      "I'm seeing some patterns I want to flag. Over the last 3 weeks:\n\n1. **Copper walks dropped from 5/week to 3/week.** You used to alternate with Allegra, but you've been skipping yours on office days.\n2. **Focus blocks are getting overwritten.** 4 weeks ago you had 8 hrs/week of protected DNS time. Last week: 3 hrs.\n3. **Dad mode is creeping.** Twice last week you had work messages after 7:30pm (your usual hard stop).\n4. **Social calendar is empty.** No dinners with friends, no date night, no Havdalah attendance in 2 weeks.\n5. **Meeting decline rate spiked.** You declined 8 meetings last week (vs. average of 4).\n\nNone of these alone is alarming. Together, they suggest you're running hot. This week should be better with Allegra back, but I'd recommend protecting Friday as a reset day.\n\nI can clear your afternoon if you want.",
+      "I'm seeing some patterns I want to flag. Over the last 3 weeks:\n\n1. **Copper walks dropped from 5/week to 3/week.** You used to alternate with Sarah, but you've been skipping yours on office days.\n2. **Focus blocks are getting overwritten.** 4 weeks ago you had 8 hrs/week of protected DNS time. Last week: 3 hrs.\n3. **Dad mode is creeping.** Twice last week you had work messages after 7:30pm (your usual hard stop).\n4. **Social calendar is empty.** No dinners with friends, no date night, no Havdalah attendance in 2 weeks.\n5. **Meeting decline rate spiked.** You declined 8 meetings last week (vs. average of 4).\n\nNone of these alone is alarming. Together, they suggest you're running hot. This week should be better with Sarah back, but I'd recommend protecting Friday as a reset day.\n\nI can clear your afternoon if you want.",
     confidence: "medium",
     confidenceReason:
-      "Cross-domain synthesis: 5 signals from 4 data sources (Work calendar, Heath Fam, Maddie, Personal). Context: ~132,800 tokens across 8 contributing agents. This is reasoning over heterogeneous personal context, not retrieval.",
+      "Cross-domain synthesis: 5 signals from 4 data sources (Work calendar, Chen Fam, Maddie, Personal). Context: ~132,800 tokens across 8 contributing agents. This is reasoning over heterogeneous personal context, not retrieval.",
   },
   {
     triggers: ["schedule", "week", "this week", "what's on", "calendar"],
     content:
-      "Weekly delegate report:\n\n**Auto-actions taken:**\n• Declined 3 meetings (saved 4 hrs)\n• Protected Wed/Fri morning focus blocks\n• Blocked Tuesday evening for anniversary\n• Extended Maddie's hours Mon-Wed (Allegra traveling)\n\n**Schedule health:** 68/100 (↑6 from last week)\n**Meeting load:** 18 hrs (within target)\n**Focus time:** 7 hrs protected (↑4 from last week)\n**Burnout signals:** 2 of 5 active (Copper walks ↓, social calendar empty)\n\n**Recommendation:** Book a dinner with friends this weekend. Your social calendar has been empty for 2 weeks.",
+      "Weekly delegate report:\n\n**Auto-actions taken:**\n• Declined 3 meetings (saved 4 hrs)\n• Protected Wed/Fri morning focus blocks\n• Blocked Tuesday evening for anniversary\n• Extended Maddie's hours Mon-Wed (Sarah traveling)\n\n**Schedule health:** 68/100 (↑6 from last week)\n**Meeting load:** 18 hrs (within target)\n**Focus time:** 7 hrs protected (↑4 from last week)\n**Burnout signals:** 2 of 5 active (Copper walks ↓, social calendar empty)\n\n**Recommendation:** Book a dinner with friends this weekend. Your social calendar has been empty for 2 weeks.",
     confidence: "high",
     confidenceReason:
       "Full autonomous report. 8 shared memory sources contributing. Cross-calendar coordination active.",

@@ -22,6 +22,14 @@ const TeamContext = React.createContext<TeamContextValue | undefined>(undefined)
 
 const STORAGE_KEY = "claude-agents-team";
 
+const DEFAULT_TEAM: TeamAgent[] = [
+  { id: "calendaring", trustStage: 0 as TrustStage },
+  { id: "meal-planner", trustStage: 2 as TrustStage },
+  { id: "grocery-shopper", trustStage: 1 as TrustStage },
+  { id: "friend-keeper", trustStage: 3 as TrustStage },
+  { id: "email-drafter", trustStage: 0 as TrustStage },
+];
+
 export function TeamProvider({ children }: { children: React.ReactNode }) {
   const [teamAgents, setTeamAgents] = React.useState<TeamAgent[]>([]);
   const [mounted, setMounted] = React.useState(false);
@@ -31,16 +39,19 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed)) {
-          // Handle legacy format (string[]) and new format (TeamAgent[])
+        if (Array.isArray(parsed) && parsed.length > 0) {
           const agents = parsed.map((item: string | TeamAgent) =>
             typeof item === "string" ? { id: item, trustStage: 0 as TrustStage } : item
           );
           setTeamAgents(agents);
+        } else {
+          setTeamAgents(DEFAULT_TEAM);
         }
+      } else {
+        setTeamAgents(DEFAULT_TEAM);
       }
     } catch {
-      // Ignore
+      setTeamAgents(DEFAULT_TEAM);
     }
     setMounted(true);
   }, []);

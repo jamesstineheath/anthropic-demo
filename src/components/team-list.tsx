@@ -11,7 +11,7 @@ export function TeamList() {
 
   if (!mounted) {
     return (
-      <div className="px-3 py-2 text-[13px] text-muted-foreground">
+      <div className="px-3 py-2 text-sm text-muted-foreground">
         Loading...
       </div>
     );
@@ -21,7 +21,7 @@ export function TeamList() {
     return (
       <div className="flex flex-col items-center gap-2 px-3 py-4 text-center">
         <Users className="h-4 w-4 text-muted-foreground/40" />
-        <p className="text-[11px] leading-relaxed text-muted-foreground/60">
+        <p className="text-sm leading-relaxed text-muted-foreground/60">
           Add agents from the marketplace to build your team.
         </p>
       </div>
@@ -38,11 +38,11 @@ export function TeamList() {
           <Link
             key={id}
             href={`/agents/${id}`}
-            className="flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-[13px] transition-colors hover:bg-accent"
+            className="flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-sm transition-colors hover:bg-accent"
           >
             <Icon className="h-3.5 w-3.5 shrink-0 text-primary" />
             <span className="truncate font-medium">{agent.name}</span>
-            <span className="ml-auto shrink-0 text-[10px] text-muted-foreground/60">
+            <span className="ml-auto shrink-0 text-xs text-muted-foreground/60">
               {TRUST_STAGE_LABELS[trustStage]}
             </span>
           </Link>

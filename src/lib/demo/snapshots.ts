@@ -15,7 +15,7 @@ const LEVEL_0_MESSAGES: ChatMessage[] = [
     id: "onboard-0",
     role: "agent",
     content:
-      "Hi! I'm your Calendaring agent. Right now I can help with general scheduling questions and time management tips. As I learn about you, I'll unlock more personalized capabilities.\n\nLet's start with a few quick questions.",
+      "Hi! I'm your Calendar agent. Right now I can help with general scheduling questions and time management tips. As I learn about you, I'll unlock more personalized capabilities.\n\nLet's start with a few quick questions.",
     timestamp: ts,
     quickReplies: ["Night owl", "Morning person", "It depends"],
   },
@@ -23,7 +23,7 @@ const LEVEL_0_MESSAGES: ChatMessage[] = [
 
 const LEVEL_1_MESSAGES: ChatMessage[] = [
   // Onboarding Q&A
-  { id: "s-0", role: "agent", content: "Hi! I'm your Calendaring agent. Right now I can help with general scheduling questions and time management tips. As I learn about you, I'll unlock more personalized capabilities.\n\nLet's start with a few quick questions.", timestamp: ts },
+  { id: "s-0", role: "agent", content: "Hi! I'm your Calendar agent. Right now I can help with general scheduling questions and time management tips. As I learn about you, I'll unlock more personalized capabilities.\n\nLet's start with a few quick questions.", timestamp: ts },
   { id: "s-1", role: "agent", content: "Are you more of a morning person or a night owl?", timestamp: ts },
   { id: "u-1", role: "user", content: "Night owl", timestamp: ts },
   { id: "s-2", role: "agent", content: "Do you prefer meetings clustered together or spread throughout the day?", timestamp: ts },
@@ -59,7 +59,7 @@ const LEVEL_4_MESSAGES: ChatMessage[] = [
   ...LEVEL_3_MESSAGES,
   // Stage 3 interaction — schedule health
   { id: "u-9", role: "user", content: "How's my schedule health?", timestamp: ts },
-  { id: "s-9", role: "agent", content: "Schedule health: **62/100** (down from 71 last week).\n\nBreakdown:\n• **Meeting load** is normal (18 hrs, your average)\n• **Personal time** is compressed — you're solo parenting Mon-Wed with Allegra traveling, which means zero buffer\n• **Focus blocks** — none longer than 90 min this week\n• **Dog walks** are happening (good sign), but you skipped your usual Friday afternoon downtime last week\n\nBiggest risk: Tuesday is your anniversary and your densest meeting day. If anything runs long, your evening is gone.", timestamp: ts },
+  { id: "s-9", role: "agent", content: "Schedule health: **62/100** (down from 71 last week).\n\nBreakdown:\n• **Meeting load** is normal (18 hrs, your average)\n• **Personal time** is compressed — you're solo parenting Mon-Wed with Sarah traveling, which means zero buffer\n• **Focus blocks** — none longer than 90 min this week\n• **Dog walks** are happening (good sign), but you skipped your usual Friday afternoon downtime last week\n\nBiggest risk: Tuesday is your anniversary and your densest meeting day. If anything runs long, your evening is gone.", timestamp: ts },
   { id: "s-lvl4", role: "agent", content: "I've earned enough trust to advance.\n\nI'm now at **Stage 4: Proactive Partner**. I have new capabilities — ask me what's changed.", timestamp: ts },
 ];
 
@@ -67,7 +67,7 @@ const LEVEL_5_MESSAGES: ChatMessage[] = [
   ...LEVEL_4_MESSAGES,
   // Stage 4 interaction — anniversary conflict (emotional high point)
   { id: "u-10", role: "user", content: "What did you do about the anniversary conflict?", timestamp: ts },
-  { id: "s-10", role: "agent", content: "I declined the Product Strategy Review on your behalf. Here's what I sent to Azita:\n\n> \"James has a personal commitment Tuesday evening that he can't move. He's available Thursday 11am-12pm if that works for the team, or he can review materials async Wednesday and send comments by EOD.\"\n\nI also blocked 5:30-9:00pm on your work calendar as \"Personal — Anniversary\" so nothing else lands there. Allegra's back Wednesday night, so Thursday onward your evenings are shared again.\n\nHappy anniversary, by the way.", timestamp: ts },
+  { id: "s-10", role: "agent", content: "I declined the Product Strategy Review on your behalf. Here's what I sent to Azita:\n\n> \"Alex has a personal commitment Tuesday evening that he can't move. He's available Thursday 11am-12pm if that works for the team, or he can review materials async Wednesday and send comments by EOD.\"\n\nI also blocked 5:30-9:00pm on your work calendar as \"Personal — Anniversary\" so nothing else lands there. Sarah's back Wednesday night, so Thursday onward your evenings are shared again.\n\nHappy anniversary, by the way.", timestamp: ts },
   { id: "s-lvl5", role: "agent", content: "I've earned enough trust to advance.\n\nI'm now at **Stage 5: Trusted Delegate**. I have new capabilities — ask me what's changed.", timestamp: ts },
 ];
 
@@ -121,7 +121,7 @@ export const DEMO_SNAPSHOTS: Record<number, DemoSnapshot> = {
       focusPattern: "Wed 9-11am (4/4 weeks), Fri 9-11am (3/4 weeks)",
       energyCurve: "Best deep work 9-11am home days. Post-commute 10:30am office days.",
       scheduleHealthScore: "62/100",
-      soloParentingWeek: "Allegra in San Diego Mon-Wed",
+      soloParentingWeek: "Sarah in San Diego Mon-Wed",
     },
     messages: LEVEL_4_MESSAGES,
   },
@@ -135,7 +135,7 @@ export const DEMO_SNAPSHOTS: Record<number, DemoSnapshot> = {
       focusPattern: "Wed 9-11am (4/4 weeks), Fri 9-11am (3/4 weeks)",
       energyCurve: "Best deep work 9-11am home days. Post-commute 10:30am office days.",
       scheduleHealthScore: "68/100",
-      soloParentingWeek: "Allegra in San Diego Mon-Wed",
+      soloParentingWeek: "Sarah in San Diego Mon-Wed",
       autoDeclineRules: "5+ declines in 8 weeks, No Recurring Wed, out-of-domain",
       anniversaryProtected: "Tuesday evening blocked, Azita meeting declined",
     },

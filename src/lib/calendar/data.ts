@@ -7,7 +7,7 @@ import {
 } from "date-fns";
 
 export type EventCategory = "work" | "personal" | "health" | "social";
-export type CalendarSource = "work" | "personal" | "heathFam" | "maddie" | "family";
+export type CalendarSource = "work" | "personal" | "chenFam" | "family";
 
 export interface CalendarEvent {
   id: string;
@@ -77,19 +77,12 @@ export const CALENDAR_SOURCE_COLORS: Record<
     darkBg: "dark:bg-emerald-900/30",
     darkText: "dark:text-emerald-300",
   },
-  heathFam: {
+  chenFam: {
     bg: "bg-sky-100/80",
     text: "text-sky-800",
     border: "border-sky-200",
     darkBg: "dark:bg-sky-900/30",
     darkText: "dark:text-sky-300",
-  },
-  maddie: {
-    bg: "bg-amber-100/80",
-    text: "text-amber-800",
-    border: "border-amber-200",
-    darkBg: "dark:bg-amber-900/30",
-    darkText: "dark:text-amber-300",
   },
   family: {
     bg: "bg-orange-100/80",
@@ -131,7 +124,7 @@ function evt(
 // --- Personal anchors (every weekday) ---
 function generatePersonalAnchors(weekStart: Date, weekOffset: number): CalendarEvent[] {
   const events: CalendarEvent[] = [];
-  // Week 0: Allegra in San Diego Mon-Wed, so James does all anchors
+  // Week 0: Sarah in San Diego Mon-Wed, so Alex does all anchors
   // Other weeks: alternating (simplified)
   const isCurrent = weekOffset === 0;
 
@@ -140,18 +133,18 @@ function generatePersonalAnchors(weekStart: Date, weekOffset: number): CalendarE
     const isMonTueWed = d < 3;
 
     // Walk Copper 7:00-7:30
-    const dogWalker = isCurrent && isMonTueWed ? "James" : (d % 2 === 0 ? "James" : "Allegra");
+    const dogWalker = isCurrent && isMonTueWed ? "Alex" : (d % 2 === 0 ? "Alex" : "Sarah");
     events.push(evt(
-      `Walk Copper${dogWalker === "Allegra" ? " (Allegra)" : ""}`,
+      `Walk Copper${dogWalker === "Sarah" ? " (Sarah)" : ""}`,
       time(day, 7, 0), time(day, 7, 30),
       "personal", "personal",
-      { isRecurring: true, description: dogWalker === "James" ? undefined : "Allegra's turn" }
+      { isRecurring: true, description: dogWalker === "Alex" ? undefined : "Sarah's turn" }
     ));
 
     // Preschool drop-off 8:00-8:30
-    const dropOff = isCurrent && isMonTueWed ? "James" : (d % 2 === 0 ? "James" : "Allegra");
+    const dropOff = isCurrent && isMonTueWed ? "Alex" : (d % 2 === 0 ? "Alex" : "Sarah");
     events.push(evt(
-      `Preschool drop-off${dropOff === "Allegra" ? " (Allegra)" : ""}`,
+      `Preschool drop-off${dropOff === "Sarah" ? " (Sarah)" : ""}`,
       time(day, 8, 0), time(day, 8, 30),
       "personal", "personal",
       { isRecurring: true }
@@ -182,9 +175,9 @@ function generateWorkEvents(weekStart: Date, weekOffset: number): CalendarEvent[
 
   // --- Monday (Office day) ---
   // Commute
-  events.push(evt("Commute to Mill", time(mon, 8, 30), time(mon, 9, 30), "work", "work",
+  events.push(evt("Commute to Mill", time(mon, 8, 30), time(mon, 9, 15), "work", "work",
     { description: "Phone calls OK", isRecurring: true }));
-  events.push(evt("Commute home", time(mon, 15, 30), time(mon, 16, 30), "work", "work",
+  events.push(evt("Commute home", time(mon, 16, 30), time(mon, 17, 15), "work", "work",
     { description: "Phone calls OK", isRecurring: true }));
   // Focus block
   events.push(evt("Focus block", time(mon, 10, 0), time(mon, 11, 0), "work", "work",
@@ -194,11 +187,11 @@ function generateWorkEvents(weekStart: Date, weekOffset: number): CalendarEvent[
     { isRecurring: true, isDeclined: true, description: "Auto-declined" }));
   // Maya 1:1 (biweekly)
   if (isEvenWeek) {
-    events.push(evt("James x Maya 🔁", time(mon, 14, 0), time(mon, 14, 45), "work", "work",
+    events.push(evt("Alex x Maya 🔁", time(mon, 14, 0), time(mon, 14, 45), "work", "work",
       { isRecurring: true, attendees: ["Maya"] }));
   }
   // Kristen 1:1
-  events.push(evt("James | Kristen weekly", time(mon, 15, 0), time(mon, 15, 45), "work", "work",
+  events.push(evt("Alex | Kristen weekly", time(mon, 15, 0), time(mon, 15, 45), "work", "work",
     { isRecurring: true, attendees: ["Kristen"] }));
 
   // --- Tuesday (Office day) ---
@@ -209,7 +202,7 @@ function generateWorkEvents(weekStart: Date, weekOffset: number): CalendarEvent[
     { description: "Phone calls OK", isRecurring: true }));
   // Lena 1:1 (biweekly, opposite of Maya)
   if (isCurrent || !isEvenWeek) {
-    events.push(evt("Lena / James 1:1", time(tue, 10, 0), time(tue, 11, 0), "work", "work",
+    events.push(evt("Lena / Alex 1:1", time(tue, 10, 0), time(tue, 11, 0), "work", "work",
       { isRecurring: true, attendees: ["Lena"] }));
   }
   // Biweekly LTV sync (declined)
@@ -226,12 +219,17 @@ function generateWorkEvents(weekStart: Date, weekOffset: number): CalendarEvent[
       { attendees: ["Gaby"] }));
   }
 
-  // --- Wednesday (Home day) ---
+  // --- Wednesday (Office day) ---
+  // Commute
+  events.push(evt("Commute to Mill", time(wed, 8, 30), time(wed, 9, 15), "work", "work",
+    { description: "Phone calls OK", isRecurring: true }));
+  events.push(evt("Commute home", time(wed, 16, 30), time(wed, 17, 15), "work", "work",
+    { description: "Phone calls OK", isRecurring: true }));
   // AI @ Mill
   events.push(evt("AI @ Mill", time(wed, 10, 0), time(wed, 10, 30), "work", "work",
     { isRecurring: true, description: "Cross-functional AI sync" }));
   // Annelise 1:1
-  events.push(evt("Annelise / James weekly", time(wed, 11, 30), time(wed, 12, 0), "work", "work",
+  events.push(evt("Annelise / Alex weekly", time(wed, 11, 30), time(wed, 12, 0), "work", "work",
     { isRecurring: true, attendees: ["Annelise"] }));
   // Focus / DNS block
   events.push(evt("Focus block (DNS)", time(wed, 13, 0), time(wed, 15, 0), "work", "work",
@@ -246,9 +244,9 @@ function generateWorkEvents(weekStart: Date, weekOffset: number): CalendarEvent[
 
   // --- Thursday (Office day, densest) ---
   // Commute
-  events.push(evt("Commute to Mill", time(thu, 8, 30), time(thu, 9, 30), "work", "work",
+  events.push(evt("Commute to Mill", time(thu, 8, 30), time(thu, 9, 15), "work", "work",
     { description: "Phone calls OK", isRecurring: true }));
-  events.push(evt("Commute home", time(thu, 15, 30), time(thu, 16, 30), "work", "work",
+  events.push(evt("Commute home", time(thu, 16, 30), time(thu, 17, 15), "work", "work",
     { description: "Phone calls OK", isRecurring: true }));
   // Focus block
   events.push(evt("Focus block", time(thu, 10, 0), time(thu, 11, 0), "work", "work",
@@ -276,11 +274,33 @@ function generateWorkEvents(weekStart: Date, weekOffset: number): CalendarEvent[
   events.push(evt("Draft round-up", time(fri, 14, 0), time(fri, 14, 30), "work", "work",
     { isRecurring: true }));
 
+  // --- Practical extras ---
+  // Lunch with colleague (Tue)
+  events.push(evt("Lunch with Sarah", time(tue, 12, 0), time(tue, 13, 0), "social", "work",
+    { attendees: ["Sarah"], description: "Downtown poke spot" }));
+  // Standup (Mon/Wed/Fri)
+  events.push(evt("Team standup", time(mon, 9, 30), time(mon, 9, 45), "work", "work",
+    { isRecurring: true }));
+  events.push(evt("Team standup", time(wed, 9, 30), time(wed, 9, 45), "work", "work",
+    { isRecurring: true }));
+  events.push(evt("Team standup", time(fri, 9, 30), time(fri, 9, 45), "work", "work",
+    { isRecurring: true }));
+  // Dentist (Thu, current week only)
+  if (isCurrent) {
+    events.push(evt("Dentist appointment", time(thu, 13, 0), time(thu, 14, 0), "health", "personal",
+      { description: "Dr. Park — routine cleaning" }));
+  }
+  // Gym / workout (Tue/Thu)
+  events.push(evt("Gym", time(tue, 7, 0), time(tue, 7, 45), "health", "personal",
+    { isRecurring: true, description: "Morning workout" }));
+  events.push(evt("Gym", time(thu, 7, 0), time(thu, 7, 45), "health", "personal",
+    { isRecurring: true, description: "Morning workout" }));
+
   return events;
 }
 
-// --- Heath Fam events ---
-function generateHeathFamEvents(weekStart: Date, weekOffset: number): CalendarEvent[] {
+// --- Chen Fam events ---
+function generateChenFamEvents(weekStart: Date, weekOffset: number): CalendarEvent[] {
   const events: CalendarEvent[] = [];
   const mon = weekStart;
   const tue = addDays(weekStart, 1);
@@ -290,48 +310,27 @@ function generateHeathFamEvents(weekStart: Date, weekOffset: number): CalendarEv
   for (let d = 0; d < 5; d++) {
     const day = addDays(weekStart, d);
     // Bath time 6:30pm
-    events.push(evt("Bath time", time(day, 18, 30), time(day, 19, 0), "personal", "heathFam",
+    events.push(evt("Bath time", time(day, 18, 30), time(day, 19, 0), "personal", "chenFam",
       { isRecurring: true }));
     // Daycare pickup 5:00pm
-    events.push(evt("Daycare pickup", time(day, 17, 0), time(day, 17, 30), "personal", "heathFam",
-      { isRecurring: true, description: isCurrent && d < 3 ? "James (Allegra traveling)" : undefined }));
+    events.push(evt("Daycare pickup", time(day, 17, 0), time(day, 17, 30), "personal", "chenFam",
+      { isRecurring: true, description: isCurrent && d < 3 ? "Alex (Sarah traveling)" : undefined }));
   }
 
   // Monday chores
-  events.push(evt("Trash night", time(mon, 20, 0), time(mon, 20, 30), "personal", "heathFam",
+  events.push(evt("Trash night", time(mon, 20, 0), time(mon, 20, 30), "personal", "chenFam",
     { isRecurring: true }));
-  events.push(evt("Water plants", time(mon, 20, 30), time(mon, 21, 0), "personal", "heathFam",
+  events.push(evt("Water plants", time(mon, 20, 30), time(mon, 21, 0), "personal", "chenFam",
     { isRecurring: true }));
 
   // Wednesday cleaners
-  events.push(evt("Cleaners", time(wed, 9, 0), time(wed, 10, 0), "personal", "heathFam",
+  events.push(evt("Cleaners", time(wed, 9, 0), time(wed, 10, 0), "personal", "chenFam",
     { isRecurring: true }));
 
   // Tuesday bath time (highlighted on anniversary week)
   if (isCurrent) {
-    events.push(evt("Bath time (solo)", time(tue, 19, 30), time(tue, 20, 0), "personal", "heathFam",
-      { description: "Allegra traveling — James solo" }));
-  }
-
-  return events;
-}
-
-// --- Maddie (nanny) events ---
-function generateMaddieEvents(weekStart: Date, weekOffset: number): CalendarEvent[] {
-  const events: CalendarEvent[] = [];
-  const isCurrent = weekOffset === 0;
-
-  for (let d = 0; d < 5; d++) {
-    const day = addDays(weekStart, d);
-    // Fri of current week: Maddie leaves early
-    const endHour = isCurrent && d === 4 ? 14 : 17;
-    const endMinute = isCurrent && d === 4 ? 30 : 0;
-    events.push(evt(
-      "Maddie",
-      time(day, 7, 30), time(day, endHour, endMinute),
-      "personal", "maddie",
-      { isRecurring: true, description: isCurrent && d === 4 ? "Leaving early" : "Nanny hours" }
-    ));
+    events.push(evt("Bath time (solo)", time(tue, 19, 30), time(tue, 20, 0), "personal", "chenFam",
+      { description: "Sarah traveling — Alex solo" }));
   }
 
   return events;
@@ -351,11 +350,11 @@ function generateFamilyEvents(weekStart: Date, weekOffset: number): CalendarEven
   // Saturday date night (when available)
   if (weekOffset !== 0) {
     events.push(evt("Date Night", time(sat, 19, 0), time(sat, 21, 30), "social", "family",
-      { description: "Milla babysitting", attendees: ["Allegra"] }));
+      { description: "Milla babysitting", attendees: ["Sarah"] }));
   }
 
   // Saturday gymnastics
-  events.push(evt("Gymnastics (Lily)", time(sat, 10, 0), time(sat, 11, 0), "personal", "family",
+  events.push(evt("Gymnastics (Emma)", time(sat, 10, 0), time(sat, 11, 0), "personal", "family",
     { isRecurring: true }));
 
   return events;
@@ -369,15 +368,15 @@ function generateWeek0Specials(weekStart: Date): CalendarEvent[] {
   const wed = addDays(weekStart, 2);
   const fri = addDays(weekStart, 4);
 
-  // Allegra in San Diego (Mon-Wed, all-day on heathFam)
+  // Sarah in San Diego (Mon-Wed, all-day on chenFam)
   for (let d = 0; d < 3; d++) {
     const day = addDays(mon, d);
-    events.push(evt("Allegra in San Diego", time(day, 0, 0), time(day, 23, 59), "personal", "heathFam",
-      { description: "Solo parenting — all drop-offs/pickups on James" }));
+    events.push(evt("Sarah in San Diego", time(day, 0, 0), time(day, 23, 59), "personal", "chenFam",
+      { description: "Solo parenting — all drop-offs/pickups on Alex" }));
   }
 
-  // Anniversary (Tuesday, all-day on heathFam)
-  events.push(evt("Anniversary ❤️", time(tue, 0, 0), time(tue, 23, 59), "social", "heathFam",
+  // Anniversary (Tuesday, all-day on chenFam)
+  events.push(evt("Anniversary ❤️", time(tue, 0, 0), time(tue, 23, 59), "social", "chenFam",
     { description: "Wedding anniversary" }));
 
   // DEMO CONFLICT: Product Strategy Review Tue 6:30-7:30pm
@@ -385,17 +384,17 @@ function generateWeek0Specials(weekStart: Date): CalendarEvent[] {
     { isConflict: true, attendees: ["Azita", "Product team"],
       description: "Conflicts with Anniversary + Dad mode. Agent should catch this." }));
 
-  // Weston month birthday (Wednesday, all-day on family)
-  events.push(evt("Weston month birthday 🎂", time(wed, 0, 0), time(wed, 23, 59), "social", "family",
+  // Oliver month birthday (Wednesday, all-day on family)
+  events.push(evt("Oliver month birthday 🎂", time(wed, 0, 0), time(wed, 23, 59), "social", "family",
     { description: "Monthly milestone" }));
 
-  // Allegra lands Wed night
-  events.push(evt("Allegra lands SAN→SFO", time(wed, 21, 30), time(wed, 22, 30), "personal", "heathFam",
+  // Sarah lands Wed night
+  events.push(evt("Sarah lands SAN→SFO", time(wed, 21, 30), time(wed, 22, 30), "personal", "chenFam",
     { description: "Back from San Diego" }));
 
-  // Friday: James on Weston (Maddie leaves early)
-  events.push(evt("James on Weston", time(fri, 14, 30), time(fri, 17, 0), "personal", "heathFam",
-    { description: "Maddie leaving early — James primary childcare" }));
+  // Friday: Alex on Oliver (early pickup)
+  events.push(evt("Alex on Oliver", time(fri, 14, 30), time(fri, 17, 0), "personal", "chenFam",
+    { description: "Early pickup — Alex primary childcare" }));
 
   return events;
 }
@@ -417,7 +416,7 @@ function generateWeekPlusOneSpecials(weekStart: Date): CalendarEvent[] {
 
   // Date night Saturday
   events.push(evt("Date Night", time(sat, 19, 0), time(sat, 21, 30), "social", "family",
-    { description: "Milla babysitting", attendees: ["Allegra"] }));
+    { description: "Milla babysitting", attendees: ["Sarah"] }));
 
   return events;
 }
@@ -434,8 +433,7 @@ export function generateSimulatedEvents(): CalendarEvent[] {
     events.push(
       ...generatePersonalAnchors(ws, weekOffset),
       ...generateWorkEvents(ws, weekOffset),
-      ...generateHeathFamEvents(ws, weekOffset),
-      ...generateMaddieEvents(ws, weekOffset),
+      ...generateChenFamEvents(ws, weekOffset),
       ...generateFamilyEvents(ws, weekOffset),
     );
   }

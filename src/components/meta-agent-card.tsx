@@ -37,8 +37,8 @@ export function MetaAgentCard({ agent }: MetaAgentCardProps) {
                 <h3 className="text-sm font-semibold leading-tight text-foreground/70">
                   {agent.name}
                 </h3>
-                <span className="text-[10px] font-medium text-muted-foreground">
-                  Meta Agent
+                <span className="text-xs font-medium text-muted-foreground">
+                  Advanced Agent
                 </span>
               </div>
             </div>
@@ -57,7 +57,7 @@ export function MetaAgentCard({ agent }: MetaAgentCardProps) {
                     <Badge
                       key={prereq.agentId}
                       variant="outline"
-                      className="text-[10px] font-normal text-muted-foreground"
+                      className="text-xs font-normal text-muted-foreground"
                     >
                       {prereqAgent?.name ?? prereq.agentId} L
                       {prereq.minTrustStage}+

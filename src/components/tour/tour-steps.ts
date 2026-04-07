@@ -174,7 +174,7 @@ export const TOUR_STEPS: TourStep[] = [
     narratorPosition: "top-left",
     trustStage: 3 as TrustStage,
     xrayVisible: true,
-    chatMessage: "Schedule health: **62/100** (down from 71 last week).\n\nBreakdown:\n• **Meeting load** is normal (18 hrs, your average)\n• **Personal time** is compressed — you're solo parenting Mon-Wed with Allegra traveling, which means zero buffer\n• **Focus blocks** — none longer than 90 min this week\n\nBiggest risk: Tuesday is your anniversary and your densest meeting day. If anything runs long, your evening is gone.",
+    chatMessage: "Schedule health: **62/100** (down from 71 last week).\n\nBreakdown:\n• **Meeting load** is normal (18 hrs, your average)\n• **Personal time** is compressed — you're solo parenting Mon-Wed with Sarah traveling, which means zero buffer\n• **Focus blocks** — none longer than 90 min this week\n\nBiggest risk: Tuesday is your anniversary and your densest meeting day. If anything runs long, your evening is gone.",
     waitForAction: "none",
   },
   {
@@ -190,11 +190,11 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "anniversary-conflict",
     narratorTitle: "Level 4: The Anniversary Conflict",
-    narratorBody: "This is the moment progressive trust earns its name. A meeting request for 6:30pm on your anniversary. The agent knows Allegra is Tier 1 (partner), Azita is Tier 4. It recommends declining and proposes Thursday 11am.",
+    narratorBody: "This is the moment progressive trust earns its name. A meeting request for 6:30pm on your anniversary. The agent knows Sarah is Tier 1 (partner), Azita is Tier 4. It recommends declining and proposes Thursday 11am.",
     narratorPosition: "top-right",
     trustStage: 4 as TrustStage,
     xrayVisible: false,
-    chatMessage: "You just got a meeting request for Tuesday 6:30–7:30pm: 'Product Strategy Review' from Azita, marked urgent. I'd push back. Here's why:\n\n1. Tuesday is your anniversary (Heath Fam calendar).\n2. Dad mode starts at 5pm — you're solo parenting this week.\n3. Even if you could attend, you'd miss bath time and dinner.\n\nI can suggest Thursday 11am instead — you have a gap between Lena's 1:1 and your afternoon meetings, and Azita is free then too. Want me to propose the reschedule?",
+    chatMessage: "You just got a meeting request for Tuesday 6:30–7:30pm: 'Product Strategy Review' from Azita, marked urgent. I'd push back. Here's why:\n\n1. Tuesday is your anniversary (Chen Fam calendar).\n2. Dad mode starts at 5pm — you're solo parenting this week.\n3. Even if you could attend, you'd miss bath time and dinner.\n\nI can suggest Thursday 11am instead — you have a gap between Lena's 1:1 and your afternoon meetings, and Azita is free then too. Want me to propose the reschedule?",
     waitForAction: "none",
   },
   {
@@ -203,7 +203,7 @@ export const TOUR_STEPS: TourStep[] = [
     narratorBody: "It declined the meeting, suggested an alternative, and blocked your evening. The message it sent is professional and doesn't reveal personal details. This is what progressive trust enables: actions you'd approve of, taken before you have to ask.",
     narratorPosition: "top-right",
     trustStage: 4 as TrustStage,
-    chatMessage: "I declined the Product Strategy Review on your behalf. Here's what I sent to Azita:\n\n> \"James has a personal commitment Tuesday evening that he can't move. He's available Thursday 11am–12pm if that works for the team, or he can review materials async Wednesday and send comments by EOD.\"\n\nI also blocked 5:30–9:00pm on your work calendar as \"Personal — Anniversary\" so nothing else lands there.\n\nHappy anniversary, by the way.",
+    chatMessage: "I declined the Product Strategy Review on your behalf. Here's what I sent to Azita:\n\n> \"Alex has a personal commitment Tuesday evening that he can't move. He's available Thursday 11am–12pm if that works for the team, or he can review materials async Wednesday and send comments by EOD.\"\n\nI also blocked 5:30–9:00pm on your work calendar as \"Personal — Anniversary\" so nothing else lands there.\n\nHappy anniversary, by the way.",
     waitForAction: "none",
   },
   {
@@ -222,7 +222,7 @@ export const TOUR_STEPS: TourStep[] = [
     narratorPosition: "top-right",
     trustStage: 5 as TrustStage,
     xrayVisible: false,
-    chatMessage: "I'm seeing some patterns I want to flag. Over the last 3 weeks:\n\n1. **Copper walks dropped from 5/week to 3/week.** You used to alternate with Allegra, but you've been skipping yours on office days.\n2. **Focus blocks are getting overwritten.** 4 weeks ago you had 8 hrs/week of protected DNS time. Last week: 3 hrs.\n3. **Dad mode is creeping.** Twice last week you had work messages after 7:30pm.\n4. **Social calendar is empty.** No dinners with friends, no date night, no Havdalah attendance in 2 weeks.\n5. **Meeting decline rate spiked.** You declined 8 meetings last week (vs. average of 4).\n\nNone of these alone is alarming. Together, they suggest you're running hot. Want me to protect Friday as a reset day?",
+    chatMessage: "I'm seeing some patterns I want to flag. Over the last 3 weeks:\n\n1. **Copper walks dropped from 5/week to 3/week.** You used to alternate with Sarah, but you've been skipping yours on office days.\n2. **Focus blocks are getting overwritten.** 4 weeks ago you had 8 hrs/week of protected DNS time. Last week: 3 hrs.\n3. **Dad mode is creeping.** Twice last week you had work messages after 7:30pm.\n4. **Social calendar is empty.** No dinners with friends, no date night, no Havdalah attendance in 2 weeks.\n5. **Meeting decline rate spiked.** You declined 8 meetings last week (vs. average of 4).\n\nNone of these alone is alarming. Together, they suggest you're running hot. Want me to protect Friday as a reset day?",
     waitForAction: "none",
   },
   {
@@ -257,7 +257,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "end-card",
     narratorTitle: "Claude Agents",
-    narratorBody: "AI that earns your trust over time.\n\nProgressive trust isn't just a safety concept. It's a product mechanic that makes AI better — more context, more capability, more value over time.\n\nBuilt as a prototype by James Heath.",
+    narratorBody: "AI that earns your trust over time.\n\nProgressive trust isn't just a safety concept. It's a product mechanic that makes AI better — more context, more capability, more value over time.\n\nBuilt as a prototype by Alex Chen.",
     narratorPosition: "center",
     route: "/",
     xrayVisible: false,

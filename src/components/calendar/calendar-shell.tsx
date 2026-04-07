@@ -161,7 +161,7 @@ export function CalendarShell() {
               key={v.value}
               onClick={() => setView(v.value)}
               className={cn(
-                "rounded-md px-2.5 py-1 text-[11px] font-medium transition-colors",
+                "rounded-md px-2.5 py-1 text-sm font-medium transition-colors",
                 view === v.value
                   ? "bg-background text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"

@@ -37,7 +37,7 @@ export function PersonaSwitcher() {
           >
             <span
               className={cn(
-                "flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold",
+                "flex h-5 w-5 items-center justify-center rounded-full text-xs font-semibold",
                 isActive
                   ? "bg-primary text-primary-foreground"
                   : "bg-muted-foreground/20 text-muted-foreground"
@@ -47,7 +47,7 @@ export function PersonaSwitcher() {
             </span>
             <span>{persona.name}</span>
             {!persona.isInteractive && (
-              <span className="text-[9px] text-muted-foreground/60 ml-0.5">
+              <span className="text-xs text-muted-foreground/60 ml-0.5">
                 Preview
               </span>
             )}

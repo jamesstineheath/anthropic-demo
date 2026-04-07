@@ -24,7 +24,7 @@ export function MonthView({ onEventClick, onDayClick }: MonthViewProps) {
         {WEEKDAYS.map((day) => (
           <div
             key={day}
-            className="px-2 py-2 text-center text-[10px] uppercase text-muted-foreground"
+            className="px-2 py-2 text-center text-xs uppercase text-muted-foreground"
           >
             {day}
           </div>
@@ -64,7 +64,7 @@ export function MonthView({ onEventClick, onDayClick }: MonthViewProps) {
                     <div
                       key={event.id}
                       className={cn(
-                        "truncate rounded px-1 py-px text-[9px] leading-tight cursor-pointer",
+                        "truncate rounded px-1 py-px text-xs leading-tight cursor-pointer",
                         colors.bg,
                         colors.text,
                         colors.darkBg,
@@ -81,7 +81,7 @@ export function MonthView({ onEventClick, onDayClick }: MonthViewProps) {
                   );
                 })}
                 {dayEvents.length > 3 && (
-                  <div className="text-[9px] text-muted-foreground px-1">
+                  <div className="text-xs text-muted-foreground px-1">
                     +{dayEvents.length - 3} more
                   </div>
                 )}

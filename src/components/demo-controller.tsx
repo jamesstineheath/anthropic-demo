@@ -101,7 +101,7 @@ export function DemoController() {
           className="flex items-center gap-1 rounded-full bg-black/80 px-3 py-1.5 text-white backdrop-blur-sm border border-white/10 hover:bg-black/90 transition-colors"
         >
           <Play className="h-3 w-3" />
-          <span className="text-[10px] font-mono">L{trustStage}</span>
+          <span className="text-xs font-mono">L{trustStage}</span>
         </button>
       </div>
     );
@@ -123,7 +123,7 @@ export function DemoController() {
             startDrag(t.clientX, t.clientY);
           }}
         >
-          <span className="text-[10px] leading-none tracking-tighter">⋮⋮</span>
+          <span className="text-xs leading-none tracking-tighter">⋮⋮</span>
         </div>
 
         {/* Back */}
@@ -143,7 +143,7 @@ export function DemoController() {
           )}
         >
           <span className="font-semibold">L{trustStage}</span>
-          <span className="text-zinc-400 ml-1.5 text-[10px]">
+          <span className="text-zinc-400 ml-1.5 text-xs">
             {TRUST_STAGE_LABELS[trustStage]}
           </span>
         </div>

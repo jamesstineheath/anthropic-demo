@@ -29,13 +29,13 @@ export function AgendaView({ onEventClick }: AgendaViewProps) {
         return (
           <div key={date.toISOString()} className="flex gap-4 px-4 py-3">
             <div className="w-20 shrink-0 pt-0.5">
-              <div className="text-[10px] uppercase text-muted-foreground">
+              <div className="text-xs uppercase text-muted-foreground">
                 {format(date, "EEE")}
               </div>
               <div className="text-lg font-semibold text-foreground">
                 {format(date, "d")}
               </div>
-              <div className="text-[10px] text-muted-foreground">
+              <div className="text-xs text-muted-foreground">
                 {format(date, "MMM")}
               </div>
             </div>
@@ -65,7 +65,7 @@ export function AgendaView({ onEventClick }: AgendaViewProps) {
                     </div>
                     <div
                       className={cn(
-                        "text-[11px] opacity-70",
+                        "text-xs opacity-70",
                         colors.text,
                         colors.darkText
                       )}
@@ -76,7 +76,7 @@ export function AgendaView({ onEventClick }: AgendaViewProps) {
                     {event.description && (
                       <div
                         className={cn(
-                          "mt-1 text-[11px] opacity-60",
+                          "mt-1 text-xs opacity-60",
                           colors.text,
                           colors.darkText
                         )}

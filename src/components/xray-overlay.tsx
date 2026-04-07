@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, Terminal, Database, Shield, Gauge, ChevronDown, ChevronUp } from "lucide-react";
+import { X, Terminal, Database, Shield, Gauge, ChevronDown, ChevronUp, Check, Lock } from "lucide-react";
 import { useXRay } from "@/components/providers/xray-provider";
 import { useTeam } from "@/components/providers/team-provider";
 import { useChat } from "@/components/providers/chat-provider";
@@ -97,23 +97,23 @@ export function XRayOverlay() {
       </div>
 
       {/* 3-column content */}
-      <div className="grid grid-cols-3 gap-px bg-zinc-700 max-h-[45vh] overflow-hidden">
+      <div className="grid grid-cols-3 gap-px bg-zinc-700">
         {/* Column 1: System Prompt */}
-        <div className="bg-zinc-900 p-4 overflow-y-auto">
+        <div className="bg-zinc-900 p-4 overflow-y-auto" style={{ maxHeight: "45vh" }}>
           <div className="flex items-center gap-2 mb-3">
             <Terminal className="h-3.5 w-3.5 text-zinc-500" />
             <span className="text-sm font-semibold uppercase tracking-wider text-zinc-400">
               System Prompt
             </span>
           </div>
-          <pre className="text-[13px] leading-relaxed text-zinc-300 font-mono whitespace-pre-wrap">
+          <pre className="text-sm leading-relaxed text-zinc-300 font-mono whitespace-pre-wrap">
             {promptExpanded ? xrayData.systemPrompt : promptPreview}
             {!promptExpanded && promptLines.length > 3 && "…"}
           </pre>
           {promptLines.length > 3 && (
             <button
               onClick={() => setPromptExpanded(!promptExpanded)}
-              className="mt-2 flex items-center gap-1 text-[13px] text-zinc-500 hover:text-zinc-300 transition-colors"
+              className="mt-2 flex items-center gap-1 text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
             >
               {promptExpanded ? (
                 <><ChevronUp className="h-3.5 w-3.5" /> Hide full prompt</>
@@ -125,7 +125,7 @@ export function XRayOverlay() {
         </div>
 
         {/* Column 2: Context Window */}
-        <div className="bg-zinc-900 p-4 overflow-y-auto">
+        <div className="bg-zinc-900 p-4 overflow-y-auto" style={{ maxHeight: "45vh" }}>
           <div className="flex items-center gap-2 mb-3">
             <Database className="h-3.5 w-3.5 text-zinc-500" />
             <span className="text-sm font-semibold uppercase tracking-wider text-zinc-400">
@@ -150,7 +150,7 @@ export function XRayOverlay() {
             {(["system", "native", "shared-memory", "conversation"] as const).map((type) => (
               <div key={type} className="flex items-center gap-1.5">
                 <div className={cn("h-2.5 w-2.5 rounded-sm", TYPE_COLORS[type])} />
-                <span className="text-[13px] text-zinc-500">
+                <span className="text-sm text-zinc-500">
                   {{ system: "System", native: "Calendar", "shared-memory": "Shared", conversation: "Chat" }[type]}
                 </span>
               </div>
@@ -167,7 +167,7 @@ export function XRayOverlay() {
             ))}
             {sharedSources.length > 0 && (
               <div>
-                <div className="text-[13px] font-semibold uppercase tracking-wider text-emerald-400/80 mt-3 mb-1.5">
+                <div className="text-sm font-semibold uppercase tracking-wider text-emerald-400/80 mt-3 mb-1.5">
                   SHARED MEMORY
                 </div>
                 {sharedSources.map((s) => {
@@ -176,9 +176,9 @@ export function XRayOverlay() {
                     <div key={s.label} className="flex items-center justify-between pl-3 py-0.5">
                       <div className="flex items-center gap-2">
                         {Icon && <Icon className="h-3 w-3 text-emerald-400/70" />}
-                        <span className="text-[13px] text-zinc-300">{s.agentName || s.label}</span>
+                        <span className="text-sm text-zinc-300">{s.agentName || s.label}</span>
                       </div>
-                      <span className="text-[13px] font-mono text-zinc-500">~{s.tokens.toLocaleString()}</span>
+                      <span className="text-sm font-mono text-zinc-500">~{s.tokens.toLocaleString()}</span>
                     </div>
                   );
                 })}
@@ -188,8 +188,8 @@ export function XRayOverlay() {
               <SourceRow key={s.label} label={s.label} tokens={s.tokens} />
             ))}
             <div className="border-t border-zinc-700 pt-2 mt-2 flex items-center justify-between">
-              <span className="text-[13px] font-semibold text-zinc-300">Total</span>
-              <span className="text-[13px] font-mono font-bold text-emerald-400">
+              <span className="text-sm font-semibold text-zinc-300">Total</span>
+              <span className="text-sm font-mono font-bold text-emerald-400">
                 ~{xrayData.totalTokens.toLocaleString()}
               </span>
             </div>
@@ -215,7 +215,7 @@ export function XRayOverlay() {
               )}>
                 {xrayData.confidence.score.toUpperCase()}
               </div>
-              <p className="text-[13px] text-zinc-400 leading-relaxed">
+              <p className="text-sm text-zinc-400 leading-relaxed">
                 {xrayData.confidence.reason}
               </p>
             </div>
@@ -223,7 +223,7 @@ export function XRayOverlay() {
         </div>
 
         {/* Column 3: Capabilities */}
-        <div className="bg-zinc-900 p-4 overflow-y-auto">
+        <div className="bg-zinc-900 p-4 overflow-y-auto" style={{ maxHeight: "45vh" }}>
           <div className="flex items-center gap-2 mb-3">
             <Shield className="h-3.5 w-3.5 text-zinc-500" />
             <span className="text-sm font-semibold uppercase tracking-wider text-zinc-400">
@@ -233,24 +233,32 @@ export function XRayOverlay() {
           <div className="space-y-4">
             {Object.entries(clusterGroups).map(([prefix, caps]) => (
               <div key={prefix}>
-                <div className="text-[13px] font-semibold uppercase tracking-wider text-zinc-500 mb-2">
+                <div className="text-sm font-semibold uppercase tracking-wider text-zinc-500 mb-2">
                   {CAPABILITY_CLUSTERS[prefix] || prefix}
                 </div>
                 <div className="space-y-1.5">
                   {caps.map((cap) => (
                     <div key={cap.cluster} className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2 min-w-0">
-                        <span className="text-sm shrink-0">
-                          {cap.unlocked ? "✅" : "○"}
+                        <span className={cn(
+                          "flex h-4 w-4 shrink-0 items-center justify-center rounded-full",
+                          cap.unlocked
+                            ? "bg-emerald-500/20"
+                            : "bg-zinc-700/50"
+                        )}>
+                          {cap.unlocked
+                            ? <Check className="h-2.5 w-2.5 text-emerald-400" />
+                            : <Lock className="h-2 w-2 text-zinc-600" />
+                          }
                         </span>
                         <span className={cn(
-                          "text-[13px] truncate",
+                          "text-sm truncate",
                           cap.unlocked ? "text-zinc-200" : "text-zinc-600"
                         )}>
                           {cap.name}
                         </span>
                       </div>
-                      <span className="text-[13px] font-mono text-zinc-600 shrink-0">
+                      <span className="text-sm font-mono text-zinc-600 shrink-0">
                         {cap.unlocked ? cap.cluster : `Stage ${cap.stage}`}
                       </span>
                     </div>
@@ -268,8 +276,8 @@ export function XRayOverlay() {
 function SourceRow({ label, tokens }: { label: string; tokens: number }) {
   return (
     <div className="flex items-center justify-between">
-      <span className="text-[13px] text-zinc-400">{label}</span>
-      <span className="text-[13px] font-mono text-zinc-500">~{tokens.toLocaleString()}</span>
+      <span className="text-sm text-zinc-400">{label}</span>
+      <span className="text-sm font-mono text-zinc-500">~{tokens.toLocaleString()}</span>
     </div>
   );
 }

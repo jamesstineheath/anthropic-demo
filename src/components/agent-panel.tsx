@@ -50,7 +50,7 @@ function Section({
         {badge && (
           <Badge
             variant="secondary"
-            className="ml-auto text-[9px] font-normal"
+            className="ml-auto text-xs font-normal"
           >
             {badge}
           </Badge>
@@ -86,10 +86,10 @@ export function AgentPanel() {
                   key={key}
                   className="rounded-lg bg-secondary/50 px-3 py-2"
                 >
-                  <div className="text-[11px] font-medium text-foreground capitalize">
+                  <div className="text-xs font-medium text-foreground capitalize">
                     {key.replace(/([A-Z])/g, " $1").trim()}
                   </div>
-                  <div className="text-[11px] text-muted-foreground mt-0.5">
+                  <div className="text-xs text-muted-foreground mt-0.5">
                     {value}
                   </div>
                 </div>
@@ -100,14 +100,14 @@ export function AgentPanel() {
                   key={cat}
                   className="rounded-lg border border-dashed border-border px-3 py-2"
                 >
-                  <div className="text-[11px] text-muted-foreground/50">
+                  <div className="text-xs text-muted-foreground/50">
                     {cat} — not yet learned
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="text-[11px] text-muted-foreground/50 text-center py-4">
+            <div className="text-xs text-muted-foreground/50 text-center py-4">
               Complete onboarding to start building memory.
             </div>
           )}
@@ -156,7 +156,7 @@ export function AgentPanel() {
                   <div className="flex-1 min-w-0">
                     <div
                       className={cn(
-                        "text-[11px] font-medium",
+                        "text-xs font-medium",
                         isCurrent
                           ? "text-primary"
                           : isPast
@@ -168,7 +168,7 @@ export function AgentPanel() {
                     </div>
                     <div
                       className={cn(
-                        "text-[10px] mt-0.5",
+                        "text-xs mt-0.5",
                         isCurrent
                           ? "text-muted-foreground"
                           : "text-muted-foreground/40"
@@ -194,21 +194,21 @@ export function AgentPanel() {
           <div className="space-y-2">
             <div className="flex items-center gap-2.5 rounded-lg bg-secondary/50 px-3 py-2">
               <div className="h-2 w-2 rounded-full bg-emerald-500" />
-              <span className="text-[11px] font-medium text-foreground">
+              <span className="text-xs font-medium text-foreground">
                 Google Calendar
               </span>
-              <span className="ml-auto text-[10px] text-emerald-600 dark:text-emerald-400">
+              <span className="ml-auto text-xs text-emerald-600 dark:text-emerald-400">
                 Connected
               </span>
             </div>
             <div className="flex items-center gap-2.5 rounded-lg border border-dashed border-border px-3 py-2">
               <div className="h-2 w-2 rounded-full bg-muted-foreground/30" />
-              <span className="text-[11px] text-muted-foreground">Gmail</span>
-              <button className="ml-auto text-[10px] text-primary hover:underline">
+              <span className="text-xs text-muted-foreground">Gmail</span>
+              <button className="ml-auto text-xs text-primary hover:underline">
                 Connect
               </button>
             </div>
-            <p className="text-[10px] text-muted-foreground/40 px-1 mt-1">
+            <p className="text-xs text-muted-foreground/40 px-1 mt-1">
               Agents access your data through secure integrations.
             </p>
           </div>

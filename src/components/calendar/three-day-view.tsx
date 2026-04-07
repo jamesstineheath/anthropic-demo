@@ -31,7 +31,7 @@ export function ThreeDayView({
                 key={i}
                 className="flex-1 border-r border-border last:border-r-0 px-2 py-2 text-center"
               >
-                <div className="text-[10px] uppercase text-muted-foreground">
+                <div className="text-xs uppercase text-muted-foreground">
                   {format(day, "EEE")}
                 </div>
                 <div

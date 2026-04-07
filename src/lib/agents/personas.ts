@@ -16,14 +16,14 @@ export interface Persona {
 export const PERSONAS: Persona[] = [
   {
     id: "james",
-    name: "James",
+    name: "Alex",
     shortBio: "Product Manager, Bay Area. Partner, 3 kids, dog.",
-    avatar: "J",
+    avatar: "A",
     location: "Marin County, CA",
     role: "Hardware/Software PM at Mill",
     context: [
       "Manages 7 calendars across work, family, nanny, and household",
-      "3 kids including a toddler in daycare, partner Allegra",
+      "3 kids including a toddler in daycare, partner Sarah",
       "In office Mon/Tue/Thu, home Wed/Fri",
       "Hard boundary: Dad mode 5-7:30pm daily",
     ],

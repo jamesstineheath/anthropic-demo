@@ -15,9 +15,17 @@ import {
   STAGE_5_RESPONSES,
   STAGE_5_FALLBACK,
   type Stage1Response,
+  type ScriptedMessage,
 } from "@/lib/chat/scripts";
 import { useTeam } from "./team-provider";
-import { TRUST_STAGE_LABELS, type TrustStage } from "@/lib/agents/data";
+import { useDemo } from "@/components/demo/demo-provider";
+import type { TrustStage } from "@/lib/agents/data";
+
+export interface ToolCall {
+  name: string;
+  status: "running" | "complete";
+  detail?: string;
+}
 
 export interface ChatMessage {
   id: string;
@@ -25,6 +33,8 @@ export interface ChatMessage {
   content: string;
   timestamp: Date;
   quickReplies?: string[];
+  toolCalls?: ToolCall[];
+  savingMemory?: boolean;
 }
 
 export interface AgentMemory {
@@ -39,6 +49,8 @@ interface ChatContextValue {
   messages: ChatMessage[];
   sendMessage: (content: string) => void;
   addMessage: (msg: Omit<ChatMessage, "id" | "timestamp">) => void;
+  clearMessages: () => void;
+  setIsTyping: (typing: boolean) => void;
   isTyping: boolean;
   memory: AgentMemory;
   onboardingStep: number;
@@ -76,6 +88,18 @@ const STAGE_FALLBACKS: Record<number, Stage1Response> = {
   5: STAGE_5_FALLBACK,
 };
 
+function scriptedToChat(msg: ScriptedMessage): ChatMessage {
+  return {
+    id: msg.id,
+    role: "agent",
+    content: msg.content,
+    timestamp: new Date(),
+    quickReplies: msg.quickReplies,
+    toolCalls: msg.toolCalls,
+    savingMemory: msg.savingMemory,
+  };
+}
+
 export function ChatProvider({ children }: { children: React.ReactNode }) {
   const [messages, setMessages] = React.useState<ChatMessage[]>([]);
   const [isTyping, setIsTyping] = React.useState(false);
@@ -88,6 +112,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     reason: string;
   } | null>(null);
   const { getTrustStage, setTrustStage, isOnTeam, mounted } = useTeam();
+  const { mode } = useDemo();
 
   const trustStage = getTrustStage("calendaring");
 
@@ -118,6 +143,11 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
+    // In tour mode the DemoDialogueBridge owns the chat — never auto-start.
+    if (mode === "tour") {
+      return;
+    }
+
     // Try to load persisted state
     const savedMemory = localStorage.getItem(MEMORY_STORAGE_KEY);
     const savedMessages = localStorage.getItem(MESSAGES_STORAGE_KEY);
@@ -136,28 +166,27 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       const firstMsg = ONBOARDING_SCRIPT[0].agentMessage;
       setIsTyping(true);
       setTimeout(() => {
-        setMessages([
-          {
-            id: firstMsg.id,
-            role: "agent",
-            content: firstMsg.content,
-            timestamp: new Date(),
-            quickReplies: firstMsg.quickReplies,
-          },
-        ]);
+        setMessages([scriptedToChat(firstMsg)]);
         setIsTyping(false);
         setOnboardingStep(1);
       }, firstMsg.delayMs);
     }
-  }, [trustStage, onTeam, mounted]);
+  }, [trustStage, onTeam, mounted, mode]);
 
+  const clearMessages = React.useCallback(() => {
+    setMessages([]);
+    setIsTyping(false);
+  }, []);
+
+  const msgCounterRef = React.useRef(0);
   const addMessage = React.useCallback(
     (msg: Omit<ChatMessage, "id" | "timestamp">) => {
+      const uid = `msg-${Date.now()}-${msgCounterRef.current++}`;
       setMessages((prev) => [
         ...prev,
         {
           ...msg,
-          id: `msg-${Date.now()}`,
+          id: uid,
           timestamp: new Date(),
         },
       ]);
@@ -188,20 +217,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     []
   );
 
-  const advanceLevel = React.useCallback(
-    (newStage: TrustStage) => {
-      setTrustStage("calendaring", newStage);
-      setInteractionsAtLevel(0);
-      const stageName = TRUST_STAGE_LABELS[newStage];
-      addAgentMessage(
-        `I've earned enough trust to advance.\n\nI'm now at **Stage ${newStage}: ${stageName}**. I have new capabilities — ask me what's changed.`,
-        undefined,
-        1200
-      );
-    },
-    [setTrustStage, addAgentMessage]
-  );
-
   const sendMessage = React.useCallback(
     (content: string) => {
       // Add user message
@@ -218,29 +233,34 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         const currentScript = ONBOARDING_SCRIPT[onboardingStep - 1];
         if (currentScript) {
           const key = currentScript.responseKey;
-          if (key !== "__intro__") {
+          if (!key.startsWith("__")) {
             setMemory((prev) => ({ ...prev, [key]: content }));
           }
         }
 
         if (onboardingStep < ONBOARDING_SCRIPT.length) {
-          const nextScript = ONBOARDING_SCRIPT[onboardingStep];
-          const nextMsg = nextScript.agentMessage;
-          setIsTyping(true);
-          setTimeout(() => {
-            setMessages((prev) => [
-              ...prev,
-              {
-                id: nextMsg.id,
-                role: "agent",
-                content: nextMsg.content,
-                timestamp: new Date(),
-                quickReplies: nextMsg.quickReplies,
-              },
-            ]);
-            setIsTyping(false);
-            setOnboardingStep((prev) => prev + 1);
-          }, nextMsg.delayMs);
+          const showStep = (stepIdx: number) => {
+            const script = ONBOARDING_SCRIPT[stepIdx];
+            const msg = script.agentMessage;
+            setIsTyping(true);
+            setTimeout(() => {
+              setMessages((prev) => [...prev, scriptedToChat(msg)]);
+              setIsTyping(false);
+              setOnboardingStep(stepIdx + 1);
+              // If this step auto-advances and there's a next step, show it
+              if (script.autoAdvance && stepIdx + 1 < ONBOARDING_SCRIPT.length) {
+                const nextNext = ONBOARDING_SCRIPT[stepIdx + 1];
+                const nnMsg = nextNext.agentMessage;
+                setIsTyping(true);
+                setTimeout(() => {
+                  setMessages((prev) => [...prev, scriptedToChat(nnMsg)]);
+                  setIsTyping(false);
+                  setOnboardingStep(stepIdx + 2);
+                }, nnMsg.delayMs);
+              }
+            }, msg.delayMs);
+          };
+          showStep(onboardingStep);
         } else {
           // Store last answer then complete onboarding
           const lastScript = ONBOARDING_SCRIPT[ONBOARDING_SCRIPT.length - 1];
@@ -249,15 +269,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
           const completeMsg = ONBOARDING_COMPLETE_MESSAGE;
           setIsTyping(true);
           setTimeout(() => {
-            setMessages((prev) => [
-              ...prev,
-              {
-                id: completeMsg.id,
-                role: "agent",
-                content: completeMsg.content,
-                timestamp: new Date(),
-              },
-            ]);
+            setMessages((prev) => [...prev, scriptedToChat(completeMsg)]);
             setIsTyping(false);
             setTrustStage("calendaring", 1 as TrustStage);
             setOnboardingStep(-1);
@@ -265,15 +277,11 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
           }, completeMsg.delayMs);
         }
       } else if (trustStage >= 1) {
-        // Stage 1-5 responses — route to correct stage
+        // Stage 1-5 responses — sequential scripted playback
         const responses = STAGE_RESPONSES[trustStage] || STAGE_1_RESPONSES;
         const fallback = STAGE_FALLBACKS[trustStage] || STAGE_1_FALLBACK;
 
-        const lowerContent = content.toLowerCase();
-        const match =
-          responses.find((r) =>
-            r.triggers.some((t) => lowerContent.includes(t))
-          ) ?? fallback;
+        const match = responses[interactionsAtLevel] ?? fallback;
 
         const responseContent = match.content
           .replace("{eventCount}", "23")
@@ -287,27 +295,12 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         });
 
         addAgentMessage(responseContent, undefined, 800).then(() => {
-          // Check for level advancement
           const newCount = interactionsAtLevel + 1;
           setInteractionsAtLevel(newCount);
-
-          if (trustStage === 1 && newCount >= 3) {
-            // Level up to 2 after 3 interactions
-            advanceLevel(2 as TrustStage);
-          } else if (trustStage === 2 && match.triggers.includes("energy")) {
-            // Level up to 3 when energy/focus pattern confirmed
-            advanceLevel(3 as TrustStage);
-          } else if (trustStage === 3 && (match.triggers.includes("health") || match.triggers.includes("conflict"))) {
-            // Level up to 4 on schedule health or conflict resolution
-            advanceLevel(4 as TrustStage);
-          } else if (trustStage === 4 && match.triggers.includes("anniversary")) {
-            // Level up to 5 on anniversary conflict resolution
-            advanceLevel(5 as TrustStage);
-          }
         });
       }
     },
-    [trustStage, onboardingStep, addAgentMessage, setTrustStage, interactionsAtLevel, advanceLevel]
+    [trustStage, onboardingStep, addAgentMessage, setTrustStage, interactionsAtLevel]
   );
 
   // Atomic snapshot loader for demo controller
@@ -339,6 +332,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         messages,
         sendMessage,
         addMessage,
+        clearMessages,
+        setIsTyping,
         isTyping,
         memory,
         onboardingStep,

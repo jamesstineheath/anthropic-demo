@@ -35,15 +35,15 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
 
   const currentStep = TOUR_STEPS[stepIndex] ?? null;
 
-  // Auto-start on first visit
-  React.useEffect(() => {
-    const complete = typeof window !== "undefined" && localStorage.getItem(TOUR_COMPLETE_KEY);
-    if (!complete) {
-      resetDemoState();
-      router.push("/");
-      setTimeout(() => setIsActive(true), 300);
-    }
-  }, [router]);
+  // Auto-start on first visit (disabled during UI iteration — re-enable when tour is ready)
+  // React.useEffect(() => {
+  //   const complete = typeof window !== "undefined" && localStorage.getItem(TOUR_COMPLETE_KEY);
+  //   if (!complete) {
+  //     resetDemoState();
+  //     router.push("/");
+  //     setTimeout(() => setIsActive(true), 300);
+  //   }
+  // }, [router]);
 
   // Restore from URL hash (only if tour not explicitly completed)
   React.useEffect(() => {

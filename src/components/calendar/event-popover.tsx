@@ -50,14 +50,14 @@ export function EventPopover({ event, onClose, onEdit }: EventPopoverProps) {
           <Tag className="h-3.5 w-3.5 text-muted-foreground" />
           <span
             className={cn(
-              "rounded-full px-2 py-0.5 text-[10px] font-medium capitalize",
+              "rounded-full px-2 py-0.5 text-xs font-medium capitalize",
               colors.bg,
               colors.text,
               colors.darkBg,
               colors.darkText
             )}
           >
-            {event.calendarSource === "heathFam" ? "Heath Fam" : event.calendarSource}
+            {event.calendarSource === "chenFam" ? "Chen Fam" : event.calendarSource}
           </span>
         </div>
 
@@ -75,7 +75,7 @@ export function EventPopover({ event, onClose, onEdit }: EventPopoverProps) {
         )}
 
         {event.isRecurring && (
-          <p className="text-[10px] text-muted-foreground/60">Recurring event</p>
+          <p className="text-xs text-muted-foreground/60">Recurring event</p>
         )}
       </div>
     </div>

@@ -38,7 +38,7 @@ export function ChatInput() {
           type="text"
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          placeholder="Ask your Calendaring agent..."
+          placeholder="Ask your Calendar agent..."
           disabled={isTyping}
           className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground/50 disabled:opacity-50"
         />
@@ -46,7 +46,7 @@ export function ChatInput() {
         {/* Model badge (decorative) */}
         <Badge
           variant="secondary"
-          className="shrink-0 text-[9px] font-medium cursor-default"
+          className="shrink-0 text-xs font-medium cursor-default"
         >
           Sonnet 4.5
         </Badge>

@@ -43,9 +43,6 @@ export default async function AgentDetailPage({
             <Badge variant="secondary" className="text-xs">
               {agent.category}
             </Badge>
-            {agent.isDeepAgent && (
-              <Badge className="text-xs">Deep Agent</Badge>
-            )}
           </div>
         </div>
       </div>
