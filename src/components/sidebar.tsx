@@ -12,6 +12,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { SidebarNav } from "@/components/sidebar-nav";
+import { DemoController } from "@/components/demo/demo-controller";
 import { getAgentById } from "@/lib/agents/data";
 import {
   getPersonaById,
@@ -132,8 +133,13 @@ function SidebarContent() {
           ) : null}
         </div>
 
+        {/* Demo Navigator */}
+        <div className="mt-auto px-4 pt-3">
+          <DemoController />
+        </div>
+
         {/* User profile (simulated) */}
-        <div className="mt-auto border-t border-border px-4 py-3">
+        <div className="border-t border-border px-4 py-3">
           <div className="flex items-center gap-2.5 px-2">
             <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/20 text-xs font-semibold text-primary">
               {persona?.avatar ?? "A"}

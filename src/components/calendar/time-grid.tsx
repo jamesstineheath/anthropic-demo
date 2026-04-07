@@ -153,7 +153,7 @@ export function TimeGrid({ days, onEventClick, onSlotClick }: TimeGridProps) {
                   return result.map(({ item, colIndex, totalCols }) => {
                     const { event, startHour, endHour } = item;
                     const topPx = (startHour - 7) * HOUR_PX;
-                    const heightPx = Math.max((endHour - startHour) * HOUR_PX, 44);
+                    const heightPx = Math.max((endHour - startHour) * HOUR_PX, 28);
                     const colors = getEventColors(event);
                     const widthPct = 100 / totalCols;
                     const leftPct = colIndex * widthPct;
@@ -162,26 +162,25 @@ export function TimeGrid({ days, onEventClick, onSlotClick }: TimeGridProps) {
                       <div
                         key={event.id}
                         className={cn(
-                          "absolute pointer-events-auto cursor-pointer rounded-md border-l-[3px] px-1.5 py-1 leading-snug overflow-hidden transition-opacity hover:opacity-90",
+                          "absolute pointer-events-auto cursor-pointer rounded px-1.5 py-0.5 leading-snug overflow-hidden hover:brightness-95 transition-all",
                           colors.bg,
                           colors.text,
                           colors.darkBg,
                           colors.darkText,
-                          event.isConflict && "ring-1 ring-red-400/50"
+                          event.isConflict && "ring-2 ring-red-500/60"
                         )}
                         style={{
                           top: `${(topPx / TOTAL_PX) * 100}%`,
                           height: `${(heightPx / TOTAL_PX) * 100}%`,
-                          left: `calc(${leftPct}% + 2px)`,
-                          width: `calc(${widthPct}% - 4px)`,
-                          borderLeftColor: 'currentColor',
+                          left: `calc(${leftPct}% + 1px)`,
+                          width: `calc(${widthPct}% - 2px)`,
                         }}
                         onClick={(e) => {
                           e.stopPropagation();
                           onEventClick(event);
                         }}
                       >
-                        <div className="font-medium truncate text-sm leading-tight">{event.title}</div>
+                        <div className="font-medium truncate text-xs leading-tight">{event.title}</div>
                       </div>
                     );
                   });

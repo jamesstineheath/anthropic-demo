@@ -127,9 +127,6 @@ export function OnboardingOverlay() {
 
       {/* Card */}
       <div className="relative z-10 w-[520px] max-w-[calc(100vw-2rem)] rounded-2xl bg-white shadow-2xl border border-zinc-200 overflow-hidden">
-        {/* Accent bar */}
-        <div className="h-1 bg-zinc-900" />
-
         <div className="p-8">
           {/* Icon */}
           <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-900/10">

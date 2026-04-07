@@ -3,7 +3,6 @@
 import { usePathname } from "next/navigation";
 import { Sidebar } from "@/components/sidebar";
 import { SidebarMobile } from "@/components/sidebar-mobile";
-import { DemoController } from "@/components/demo/demo-controller";
 import { DemoOverlay } from "@/components/demo/demo-overlay";
 import { OnboardingOverlay } from "@/components/demo/onboarding-overlay";
 import { MobileGate } from "@/components/mobile-gate";
@@ -38,7 +37,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       <OnboardingOverlay />
       <DemoOverlay />
-      <DemoController />
       <MobileGate />
     </div>
   );

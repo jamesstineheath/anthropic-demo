@@ -58,38 +58,38 @@ export const EVENT_CATEGORY_COLORS: Record<
   },
 };
 
-// Source-based colors (primary for multi-calendar display)
+// Source-based colors — Anthropic palette: warm, opaque, clean blocks
 export const CALENDAR_SOURCE_COLORS: Record<
   CalendarSource,
   { bg: string; text: string; border: string; darkBg: string; darkText: string }
 > = {
   work: {
-    bg: "bg-rose-100/80",
-    text: "text-rose-800",
-    border: "border-rose-200",
-    darkBg: "dark:bg-rose-900/30",
-    darkText: "dark:text-rose-300",
+    bg: "bg-[#F3E8E0]",
+    text: "text-[#8B5E3C]",
+    border: "border-[#E5D1C1]",
+    darkBg: "dark:bg-[#3D2B1F]",
+    darkText: "dark:text-[#D4A574]",
   },
   personal: {
-    bg: "bg-emerald-100/80",
-    text: "text-emerald-800",
-    border: "border-emerald-200",
-    darkBg: "dark:bg-emerald-900/30",
-    darkText: "dark:text-emerald-300",
+    bg: "bg-[#E4EDE4]",
+    text: "text-[#3D6B4F]",
+    border: "border-[#C8DBC8]",
+    darkBg: "dark:bg-[#1F3D2B]",
+    darkText: "dark:text-[#8BB89E]",
   },
   chenFam: {
-    bg: "bg-sky-100/80",
-    text: "text-sky-800",
-    border: "border-sky-200",
-    darkBg: "dark:bg-sky-900/30",
-    darkText: "dark:text-sky-300",
+    bg: "bg-[#E0EAF0]",
+    text: "text-[#3B6280]",
+    border: "border-[#C4D6E4]",
+    darkBg: "dark:bg-[#1F2F3D]",
+    darkText: "dark:text-[#7BA8C8]",
   },
   family: {
-    bg: "bg-orange-100/80",
-    text: "text-orange-800",
-    border: "border-orange-200",
-    darkBg: "dark:bg-orange-900/30",
-    darkText: "dark:text-orange-300",
+    bg: "bg-[#F0E8E0]",
+    text: "text-[#946B4A]",
+    border: "border-[#E0D0C0]",
+    darkBg: "dark:bg-[#3D2F1F]",
+    darkText: "dark:text-[#C8A07A]",
   },
 };
 
@@ -129,26 +129,31 @@ function generateDailyAnchors(weekStart: Date, weekOffset: number): CalendarEven
   for (let d = 0; d < 5; d++) {
     const day = addDays(weekStart, d);
     const isMonTueWed = d < 3;
+    const isTue = d === 1;
+    const isThu = d === 3;
+    const isGymDay = isTue || isThu;
 
-    // Walk Copper 7:00–7:30
-    const walker = isCurrent && isMonTueWed ? "Alex" : d % 2 === 0 ? "Alex" : "Sarah";
-    events.push(
-      evt(
-        `Walk Copper${walker === "Sarah" ? " (Sarah)" : ""}`,
-        time(day, 7, 0),
-        time(day, 7, 30),
-        "personal",
-        "personal",
-        { isRecurring: true }
-      )
-    );
+    // Walk Copper 7:00–7:30 (skip gym days — gym replaces the walk)
+    if (!isGymDay) {
+      const walker = isCurrent && isMonTueWed ? "Alex" : d % 2 === 0 ? "Alex" : "Sarah";
+      events.push(
+        evt(
+          `Walk Copper${walker === "Sarah" ? " (Sarah)" : ""}`,
+          time(day, 7, 0),
+          time(day, 7, 30),
+          "personal",
+          "personal",
+          { isRecurring: true }
+        )
+      );
+    }
 
-    // Daycare drop-off 7:30–8:00
+    // Daycare drop-off 8:00–8:30
     events.push(
       evt(
         `Daycare drop-off${isCurrent && isMonTueWed ? "" : d % 2 === 1 ? " (Sarah)" : ""}`,
-        time(day, 7, 30),
         time(day, 8, 0),
+        time(day, 8, 30),
         "personal",
         "personal",
         { isRecurring: true }
@@ -176,21 +181,6 @@ function generateDailyAnchors(weekStart: Date, weekOffset: number): CalendarEven
         isRecurring: true,
         description: "Protected — no meetings",
       })
-    );
-
-    // Daycare pickup 5:00–5:30 (Chen Fam)
-    events.push(
-      evt(
-        "Daycare pickup",
-        time(day, 17, 0),
-        time(day, 17, 30),
-        "personal",
-        "chenFam",
-        {
-          isRecurring: true,
-          description: isCurrent && isMonTueWed ? "Alex (Sarah traveling)" : undefined,
-        }
-      )
     );
   }
 
@@ -444,9 +434,9 @@ function generateChenFamEvents(weekStart: Date, weekOffset: number): CalendarEve
     })
   );
 
-  // Wednesday cleaners
+  // Wednesday cleaners (happens while working from home)
   events.push(
-    evt("Cleaners", time(wed, 9, 0), time(wed, 10, 0), "personal", "chenFam", {
+    evt("Cleaners", time(wed, 12, 0), time(wed, 13, 0), "personal", "chenFam", {
       isRecurring: true,
     })
   );
