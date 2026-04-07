@@ -102,7 +102,7 @@ export function XRayOverlay() {
         <div className="bg-zinc-900 p-4 overflow-y-auto">
           <div className="flex items-center gap-2 mb-3">
             <Terminal className="h-3.5 w-3.5 text-zinc-500" />
-            <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+            <span className="text-sm font-semibold uppercase tracking-wider text-zinc-400">
               System Prompt
             </span>
           </div>
@@ -128,7 +128,7 @@ export function XRayOverlay() {
         <div className="bg-zinc-900 p-4 overflow-y-auto">
           <div className="flex items-center gap-2 mb-3">
             <Database className="h-3.5 w-3.5 text-zinc-500" />
-            <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+            <span className="text-sm font-semibold uppercase tracking-wider text-zinc-400">
               Context Window
             </span>
           </div>
@@ -150,7 +150,7 @@ export function XRayOverlay() {
             {(["system", "native", "shared-memory", "conversation"] as const).map((type) => (
               <div key={type} className="flex items-center gap-1.5">
                 <div className={cn("h-2.5 w-2.5 rounded-sm", TYPE_COLORS[type])} />
-                <span className="text-[12px] text-zinc-500">
+                <span className="text-[13px] text-zinc-500">
                   {{ system: "System", native: "Calendar", "shared-memory": "Shared", conversation: "Chat" }[type]}
                 </span>
               </div>
@@ -167,7 +167,7 @@ export function XRayOverlay() {
             ))}
             {sharedSources.length > 0 && (
               <div>
-                <div className="text-[11px] font-semibold uppercase tracking-wider text-emerald-400/80 mt-3 mb-1.5">
+                <div className="text-[13px] font-semibold uppercase tracking-wider text-emerald-400/80 mt-3 mb-1.5">
                   SHARED MEMORY
                 </div>
                 {sharedSources.map((s) => {
@@ -205,7 +205,7 @@ export function XRayOverlay() {
             )}>
               <div className="flex items-center gap-2 mb-1.5">
                 <Gauge className="h-3.5 w-3.5 text-zinc-400" />
-                <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">Confidence</span>
+                <span className="text-sm font-semibold uppercase tracking-wider text-zinc-400">Confidence</span>
               </div>
               <div className={cn(
                 "text-lg font-mono font-bold mb-1",
@@ -226,14 +226,14 @@ export function XRayOverlay() {
         <div className="bg-zinc-900 p-4 overflow-y-auto">
           <div className="flex items-center gap-2 mb-3">
             <Shield className="h-3.5 w-3.5 text-zinc-500" />
-            <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+            <span className="text-sm font-semibold uppercase tracking-wider text-zinc-400">
               Capabilities
             </span>
           </div>
           <div className="space-y-4">
             {Object.entries(clusterGroups).map(([prefix, caps]) => (
               <div key={prefix}>
-                <div className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 mb-2">
+                <div className="text-[13px] font-semibold uppercase tracking-wider text-zinc-500 mb-2">
                   {CAPABILITY_CLUSTERS[prefix] || prefix}
                 </div>
                 <div className="space-y-1.5">
@@ -250,7 +250,7 @@ export function XRayOverlay() {
                           {cap.name}
                         </span>
                       </div>
-                      <span className="text-[11px] font-mono text-zinc-600 shrink-0">
+                      <span className="text-[13px] font-mono text-zinc-600 shrink-0">
                         {cap.unlocked ? cap.cluster : `Stage ${cap.stage}`}
                       </span>
                     </div>

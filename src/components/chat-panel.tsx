@@ -31,7 +31,7 @@ export function ChatPanel() {
       {memoryItems.length > 0 && (
         <div className="shrink-0 border-b border-border px-4 py-2 space-y-0.5">
           {memoryItems.map(([key, value]) => (
-            <div key={key} className="flex items-start gap-1.5 text-[11px] text-muted-foreground">
+            <div key={key} className="flex items-start gap-1.5 text-[13px] text-muted-foreground">
               <span className="capitalize shrink-0 text-muted-foreground/60">
                 {key.replace(/([A-Z])/g, " $1").toLowerCase()}:
               </span>

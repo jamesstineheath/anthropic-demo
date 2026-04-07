@@ -21,6 +21,12 @@ const TourContext = React.createContext<TourContextValue | undefined>(undefined)
 
 const TOUR_COMPLETE_KEY = "claude-tour-complete";
 
+function resetDemoState() {
+  localStorage.removeItem("claude-agent-memory");
+  localStorage.removeItem("claude-agent-messages");
+  sessionStorage.setItem("tour-reset-pending", "true");
+}
+
 export function TourProvider({ children }: { children: React.ReactNode }) {
   const [isActive, setIsActive] = React.useState(false);
   const [stepIndex, setStepIndex] = React.useState(0);
@@ -33,10 +39,11 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
     const complete = typeof window !== "undefined" && localStorage.getItem(TOUR_COMPLETE_KEY);
     if (!complete) {
-      // Small delay to let the page settle
+      resetDemoState();
+      router.push("/");
       setTimeout(() => setIsActive(true), 300);
     }
-  }, []);
+  }, [router]);
 
   // Restore from URL hash (only if tour not explicitly completed)
   React.useEffect(() => {
@@ -61,9 +68,12 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
     if (!isActive || !currentStep) return;
 
-    // Navigate if step specifies a route
+    // Navigate only if route is different from current path
     if (currentStep.route) {
-      router.push(currentStep.route);
+      const currentPath = window.location.pathname;
+      if (currentPath !== currentStep.route) {
+        router.push(currentStep.route);
+      }
     }
 
     // Apply xray visibility
@@ -71,8 +81,10 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
       setXrayVisible(currentStep.xrayVisible);
     }
 
-    // Persist step in URL hash
-    window.history.replaceState(null, "", `${window.location.pathname}#tour=${stepIndex}`);
+    // Persist step in URL hash (rAF to avoid blocking render)
+    requestAnimationFrame(() => {
+      window.history.replaceState(null, "", `${window.location.pathname}#tour=${stepIndex}`);
+    });
   }, [stepIndex, isActive, currentStep, router, setXrayVisible]);
 
   const next = React.useCallback(() => {
@@ -96,16 +108,18 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
   }, [router]);
 
   const startTour = React.useCallback(() => {
+    resetDemoState();
     setStepIndex(0);
     setIsActive(true);
     if (typeof window !== "undefined") {
       localStorage.removeItem(TOUR_COMPLETE_KEY);
     }
-  }, []);
+    router.push("/");
+  }, [router]);
 
   const handleQuickReply = React.useCallback((_reply: string) => {
-    // Quick replies on onboarding questions just advance the tour
-    next();
+    // Brief delay so the chip visually responds before advancing
+    setTimeout(() => next(), 200);
   }, [next]);
 
   return (

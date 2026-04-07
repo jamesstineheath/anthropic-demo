@@ -57,7 +57,7 @@ export function AgentCard({ agent, featured, viewOnly }: AgentCardProps) {
                 {agent.name}
               </h3>
               {agent.isDeepAgent && (
-                <div className="mt-0.5 flex items-center gap-1 text-[10px] font-medium text-primary">
+                <div className="mt-0.5 flex items-center gap-1 text-xs font-medium text-primary">
                   <Sparkles className="h-2.5 w-2.5" />
                   Deep Agent
                 </div>
@@ -76,23 +76,23 @@ export function AgentCard({ agent, featured, viewOnly }: AgentCardProps) {
         </p>
 
         <div className="mt-4 flex items-center justify-between gap-2">
-          <Badge variant="secondary" className="text-[10px] font-medium">
+          <Badge variant="secondary" className="text-xs font-medium">
             {agent.category}
           </Badge>
 
           {viewOnly ? (
-            <span className="text-[10px] text-muted-foreground/50 italic">
+            <span className="text-xs text-muted-foreground/50 italic">
               Switch to James to interact
             </span>
           ) : onTeam ? (
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-medium text-primary">
+              <span className="text-xs font-medium text-primary">
                 Stage {trustStage}: {TRUST_STAGE_LABELS[trustStage]}
               </span>
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 px-2 text-[11px] text-muted-foreground hover:text-destructive"
+                className="h-6 px-2 text-xs text-muted-foreground hover:text-destructive"
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();

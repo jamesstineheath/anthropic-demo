@@ -44,11 +44,11 @@ export function TourSpotlight({ selector, padding = 12, interactive = false }: T
 
   if (!selector) {
     // Full-screen backdrop — no spotlight
-    return <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px]" />;
+    return <div className="absolute inset-0 bg-black/90 backdrop-blur-sm" />;
   }
 
   if (!rect) {
-    return <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px]" />;
+    return <div className="absolute inset-0 bg-black/90 backdrop-blur-sm" />;
   }
 
   const p = padding;

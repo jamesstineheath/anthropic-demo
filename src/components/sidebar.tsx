@@ -101,12 +101,12 @@ function SidebarContent() {
               {/* Persona About */}
               {persona && (
                 <>
-                  <div className="mb-1.5 px-3 pt-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+                  <div className="mb-1.5 px-3 pt-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground/60">
                     About {persona.name}
                   </div>
                   <div className="px-3 space-y-1 mb-3">
                     {persona.context.map((item, i) => (
-                      <p key={i} className="text-[11px] text-muted-foreground leading-relaxed">
+                      <p key={i} className="text-xs text-muted-foreground leading-relaxed">
                         {item}
                       </p>
                     ))}
@@ -116,7 +116,7 @@ function SidebarContent() {
               )}
 
               {/* Your Team */}
-              <div className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+              <div className="mb-1.5 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground/60">
                 Your Team
               </div>
               <TeamList />
@@ -126,7 +126,7 @@ function SidebarContent() {
                   <Separator className="my-3" />
 
                   {/* Meta Agents */}
-                  <div className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+                  <div className="mb-1.5 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground/60">
                     Meta Agents
                   </div>
                   <div className="space-y-0.5">
@@ -155,14 +155,14 @@ function SidebarContent() {
         {/* User profile (simulated) */}
         <div className="mt-auto border-t border-border px-4 py-3">
           <div className="flex items-center gap-2.5 px-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/20 text-[11px] font-semibold text-primary">
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/20 text-xs font-semibold text-primary">
               {persona?.avatar ?? "J"}
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-[13px] font-medium leading-tight">
                 {persona?.name ?? "James"}
               </div>
-              <div className="text-[10px] text-muted-foreground">Max plan</div>
+              <div className="text-xs text-muted-foreground">Max plan</div>
             </div>
           </div>
           <div className="mt-2 px-2">
