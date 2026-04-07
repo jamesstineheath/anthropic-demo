@@ -4,6 +4,7 @@ import { useRef, useEffect } from "react";
 import Image from "next/image";
 import { useChat } from "@/components/providers/chat-provider";
 import { useTeam } from "@/components/providers/team-provider";
+import { useDemo } from "@/components/demo/demo-provider";
 import { TRUST_STAGE_DETAILS } from "@/lib/agents/trust";
 import { ChatBubble } from "./chat-bubble";
 
@@ -42,6 +43,7 @@ const STAGE_PROMPTS: Record<number, string[]> = {
 export function ChatMessages() {
   const { messages, sendMessage, isTyping } = useChat();
   const { getTrustStage } = useTeam();
+  const { mode } = useDemo();
   const scrollRef = useRef<HTMLDivElement>(null);
   const trustStage = getTrustStage("calendaring");
 
@@ -67,20 +69,22 @@ export function ChatMessages() {
           {stageDetails.description}
         </p>
 
-        <div className="w-full max-w-[300px] space-y-2">
-          <div className="text-xs font-medium text-muted-foreground/60 uppercase tracking-wider mb-2 text-center">
-            Try asking
+        {mode !== "tour" && (
+          <div className="w-full max-w-[300px] space-y-2">
+            <div className="text-xs font-medium text-muted-foreground/60 uppercase tracking-wider mb-2 text-center">
+              Try asking
+            </div>
+            {prompts.map((prompt) => (
+              <button
+                key={prompt}
+                onClick={() => sendMessage(prompt)}
+                className="w-full text-left rounded-xl border border-border bg-card px-3.5 py-2.5 text-sm text-foreground hover:border-primary/30 hover:bg-accent/50 transition-colors"
+              >
+                {prompt}
+              </button>
+            ))}
           </div>
-          {prompts.map((prompt) => (
-            <button
-              key={prompt}
-              onClick={() => sendMessage(prompt)}
-              className="w-full text-left rounded-xl border border-border bg-card px-3.5 py-2.5 text-sm text-foreground hover:border-primary/30 hover:bg-accent/50 transition-colors"
-            >
-              {prompt}
-            </button>
-          ))}
-        </div>
+        )}
       </div>
     );
   }
