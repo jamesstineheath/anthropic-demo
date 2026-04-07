@@ -94,18 +94,6 @@ export const AGENTS: Agent[] = [
     isDeepAgent: false,
     isMeta: false,
   },
-  {
-    id: "errand-runner",
-    name: "Errand Runner",
-    category: "Daily Life",
-    description:
-      "Batches and routes your errands efficiently, syncing with your calendar for optimal timing.",
-    icon: "MapPin",
-    trustStage: 0,
-    isDeepAgent: false,
-    isMeta: false,
-  },
-
   // ── Health & Wellness ───────────────────────────────────────
   {
     id: "fitness-coach",
