@@ -28,8 +28,8 @@ function ArrowButton({
       onClick={onClick}
       className={cn(
         "flex h-8 w-8 items-center justify-center rounded-md",
-        "border border-zinc-200 bg-zinc-50 text-zinc-500",
-        "hover:bg-zinc-100 hover:text-zinc-900 active:bg-zinc-200",
+        "border border-zinc-700 bg-zinc-800 text-zinc-400",
+        "hover:bg-zinc-700 hover:text-zinc-100 active:bg-zinc-600",
         "transition-colors",
         className
       )}
@@ -101,13 +101,13 @@ export function DemoController() {
       )}
       style={{ left: position.x, top: position.y }}
     >
-      <div className="rounded-2xl border border-zinc-200 bg-white shadow-lg p-4 flex flex-col items-center gap-3">
+      <div className="rounded-2xl border border-zinc-800 bg-zinc-950 shadow-2xl p-4 flex flex-col items-center gap-3">
         {/* Title + Reset */}
         <div
           className="w-full flex items-center justify-between cursor-grab"
           onMouseDown={handleMouseDown}
         >
-          <span className="text-[10px] font-semibold uppercase tracking-widest text-zinc-400">
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
             Demo Navigator
           </span>
           <div className="flex items-center gap-0.5">
@@ -116,8 +116,8 @@ export function DemoController() {
               className={cn(
                 "flex h-5 w-5 items-center justify-center rounded transition-colors",
                 tourCardsHidden
-                  ? "text-zinc-300 hover:text-zinc-700 hover:bg-zinc-100"
-                  : "text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100"
+                  ? "text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800"
+                  : "text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800"
               )}
               title={tourCardsHidden ? "Show tour cards" : "Hide tour cards"}
             >
@@ -129,7 +129,7 @@ export function DemoController() {
             </button>
             <button
               onClick={() => { goToStep(0); setMode("tour"); }}
-              className="flex h-5 w-5 items-center justify-center rounded text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition-colors"
+              className="flex h-5 w-5 items-center justify-center rounded text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
               title="Reset tour"
             >
               <RotateCcw className="h-3 w-3" />
@@ -138,7 +138,7 @@ export function DemoController() {
         </div>
 
         {/* Mode selector bar */}
-        <div className="flex items-center gap-0.5 rounded-lg border border-zinc-200 bg-zinc-50 p-0.5">
+        <div className="flex items-center gap-0.5 rounded-lg border border-zinc-700 bg-zinc-900 p-0.5">
           {MODES.map((m) => (
             <button
               key={m}
@@ -146,8 +146,8 @@ export function DemoController() {
               className={cn(
                 "px-3 py-1 text-xs font-medium rounded-md transition-all",
                 mode === m
-                  ? "bg-white text-zinc-900 shadow-sm"
-                  : "text-zinc-400 hover:text-zinc-700"
+                  ? "bg-zinc-700 text-zinc-100 shadow-sm"
+                  : "text-zinc-500 hover:text-zinc-300"
               )}
             >
               {MODE_LABELS[m]}
@@ -156,7 +156,7 @@ export function DemoController() {
         </div>
 
         {/* Step indicator */}
-        <div className="text-[10px] text-zinc-400 font-medium tabular-nums">
+        <div className="text-[10px] text-zinc-500 font-medium tabular-nums">
           {stepIndex + 1} / {totalSteps} · {currentStep.label}
         </div>
 
