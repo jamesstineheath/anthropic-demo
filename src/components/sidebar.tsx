@@ -1,10 +1,10 @@
 "use client";
 
 import { Suspense } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
-  Sparkles,
   Lock,
   Plus,
   Search,
@@ -13,24 +13,38 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { SidebarNav } from "@/components/sidebar-nav";
-import { CategoryNav } from "@/components/category-nav";
 import { TeamList } from "@/components/team-list";
-import { META_AGENTS, getAgentById } from "@/lib/agents/data";
+import { getAgentById } from "@/lib/agents/data";
+import {
+  getPersonaById,
+  getPersonaMetaAgents,
+  DEFAULT_PERSONA_ID,
+} from "@/lib/agents/personas";
 import { getIcon } from "@/lib/icons";
 
-export function Sidebar() {
+function SidebarContent() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const isAgentDetail = pathname.startsWith("/agents/");
   const agentId = isAgentDetail ? pathname.split("/agents/")[1] : null;
   const activeAgent = agentId ? getAgentById(agentId) : null;
+  const personaId = searchParams.get("persona") ?? DEFAULT_PERSONA_ID;
+  const persona = getPersonaById(personaId);
+  const metaAgents = persona ? getPersonaMetaAgents(persona) : [];
 
   return (
     <ScrollArea className="h-full">
       <div className="flex h-full min-h-screen flex-col">
-        {/* Header: Claude wordmark */}
+        {/* Header: Claude logo */}
         <div className="px-4 pt-4 pb-2">
           <div className="flex items-center gap-2 px-2">
-            <Sparkles className="h-4 w-4 text-primary" />
+            <Image
+              src="/claude-logo.svg"
+              alt="Claude"
+              width={24}
+              height={24}
+              className="dark:invert"
+            />
             <span className="text-[15px] font-semibold tracking-tight">
               Claude
             </span>
@@ -85,15 +99,22 @@ export function Sidebar() {
           ) : (
             // Agent Team sidebar content
             <>
-              {/* Categories */}
-              <div className="mb-1.5 px-3 pt-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
-                Categories
-              </div>
-              <Suspense>
-                <CategoryNav />
-              </Suspense>
-
-              <Separator className="my-3" />
+              {/* Persona About */}
+              {persona && (
+                <>
+                  <div className="mb-1.5 px-3 pt-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+                    About {persona.name}
+                  </div>
+                  <div className="px-3 space-y-1 mb-3">
+                    {persona.context.map((item, i) => (
+                      <p key={i} className="text-[11px] text-muted-foreground leading-relaxed">
+                        {item}
+                      </p>
+                    ))}
+                  </div>
+                  <Separator className="my-3" />
+                </>
+              )}
 
               {/* Your Team */}
               <div className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
@@ -101,29 +122,33 @@ export function Sidebar() {
               </div>
               <TeamList />
 
-              <Separator className="my-3" />
+              {metaAgents.length > 0 && (
+                <>
+                  <Separator className="my-3" />
 
-              {/* Meta Agents */}
-              <div className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
-                Meta Agents
-              </div>
-              <div className="space-y-0.5">
-                {META_AGENTS.map((agent) => {
-                  const Icon = getIcon(agent.icon);
-                  return (
-                    <div
-                      key={agent.id}
-                      className="flex items-center gap-2.5 rounded-lg px-3 py-1.5 opacity-40"
-                    >
-                      <Icon className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                      <span className="truncate text-[13px] text-muted-foreground">
-                        {agent.name}
-                      </span>
-                      <Lock className="ml-auto h-3 w-3 shrink-0 text-muted-foreground/40" />
-                    </div>
-                  );
-                })}
-              </div>
+                  {/* Meta Agents */}
+                  <div className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+                    Meta Agents
+                  </div>
+                  <div className="space-y-0.5">
+                    {metaAgents.map((agent) => {
+                      const Icon = getIcon(agent.icon);
+                      return (
+                        <div
+                          key={agent.id}
+                          className="flex items-center gap-2.5 rounded-lg px-3 py-1.5 opacity-40"
+                        >
+                          <Icon className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                          <span className="truncate text-[13px] text-muted-foreground">
+                            {agent.name}
+                          </span>
+                          <Lock className="ml-auto h-3 w-3 shrink-0 text-muted-foreground/40" />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
             </>
           )}
         </div>
@@ -132,10 +157,12 @@ export function Sidebar() {
         <div className="mt-auto border-t border-border px-4 py-3">
           <div className="flex items-center gap-2.5 px-2">
             <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/20 text-[11px] font-semibold text-primary">
-              J
+              {persona?.avatar ?? "J"}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-[13px] font-medium leading-tight">James</div>
+              <div className="text-[13px] font-medium leading-tight">
+                {persona?.name ?? "James"}
+              </div>
               <div className="text-[10px] text-muted-foreground">Max plan</div>
             </div>
           </div>
@@ -147,5 +174,13 @@ export function Sidebar() {
         </div>
       </div>
     </ScrollArea>
+  );
+}
+
+export function Sidebar() {
+  return (
+    <Suspense>
+      <SidebarContent />
+    </Suspense>
   );
 }

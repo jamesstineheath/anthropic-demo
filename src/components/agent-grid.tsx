@@ -1,59 +1,48 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { AGENTS, META_AGENTS, type AgentCategory } from "@/lib/agents/data";
 import { AgentCard } from "@/components/agent-card";
 import { MetaAgentCard } from "@/components/meta-agent-card";
 import { Separator } from "@/components/ui/separator";
+import {
+  getPersonaById,
+  getPersonaAgents,
+  getPersonaMetaAgents,
+  DEFAULT_PERSONA_ID,
+} from "@/lib/agents/personas";
 
 export function AgentGrid() {
   const searchParams = useSearchParams();
-  const activeCategory = searchParams.get("category") as AgentCategory | null;
+  const personaId = searchParams.get("persona") ?? DEFAULT_PERSONA_ID;
+  const persona = getPersonaById(personaId);
 
-  const filteredAgents = activeCategory
-    ? AGENTS.filter((a) => a.category === activeCategory)
-    : AGENTS;
+  if (!persona) return null;
 
-  // Calendaring is always first when showing all
-  const sortedAgents = !activeCategory
-    ? [
-        ...filteredAgents.filter((a) => a.isDeepAgent),
-        ...filteredAgents.filter((a) => !a.isDeepAgent),
-      ]
-    : filteredAgents;
+  const agents = getPersonaAgents(persona);
+  const metaAgents = getPersonaMetaAgents(persona);
+  const viewOnly = !persona.isInteractive;
+
+  // Calendaring first (featured)
+  const calendaring = agents.find((a) => a.isDeepAgent);
+  const rest = agents.filter((a) => !a.isDeepAgent);
 
   return (
     <div>
-      {/* Featured Calendaring card (full width when showing all) */}
-      {!activeCategory && sortedAgents[0]?.isDeepAgent && (
-        <>
-          <div className="mb-4">
-            <AgentCard agent={sortedAgents[0]} featured />
-          </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {sortedAgents.slice(1).map((agent) => (
-              <AgentCard key={agent.id} agent={agent} />
-            ))}
-          </div>
-        </>
-      )}
-
-      {/* Filtered view — no featured card */}
-      {(activeCategory || !sortedAgents[0]?.isDeepAgent) && (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {sortedAgents.map((agent) => (
-            <AgentCard key={agent.id} agent={agent} />
-          ))}
+      {/* Featured Calendaring card */}
+      {calendaring && (
+        <div className="mb-4">
+          <AgentCard agent={calendaring} featured viewOnly={viewOnly} />
         </div>
       )}
 
-      {filteredAgents.length === 0 && (
-        <div className="py-12 text-center text-sm text-muted-foreground">
-          No agents in this category.
-        </div>
-      )}
+      {/* Agent grid */}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {rest.map((agent) => (
+          <AgentCard key={agent.id} agent={agent} viewOnly={viewOnly} />
+        ))}
+      </div>
 
-      {!activeCategory && (
+      {metaAgents.length > 0 && (
         <>
           <Separator className="my-8" />
           <div className="mb-4">
@@ -66,7 +55,7 @@ export function AgentGrid() {
             </p>
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {META_AGENTS.map((agent) => (
+            {metaAgents.map((agent) => (
               <MetaAgentCard key={agent.id} agent={agent} />
             ))}
           </div>
