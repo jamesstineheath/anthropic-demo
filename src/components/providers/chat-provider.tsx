@@ -111,6 +111,13 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     if (initializedRef.current || !onTeam || !mounted) return;
     initializedRef.current = true;
 
+    // If tour just reset state, start clean
+    const tourResetFlag = sessionStorage.getItem("tour-reset-pending");
+    if (tourResetFlag) {
+      sessionStorage.removeItem("tour-reset-pending");
+      return;
+    }
+
     // Try to load persisted state
     const savedMemory = localStorage.getItem(MEMORY_STORAGE_KEY);
     const savedMessages = localStorage.getItem(MESSAGES_STORAGE_KEY);
