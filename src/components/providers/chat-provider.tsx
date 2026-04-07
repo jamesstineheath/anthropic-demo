@@ -166,6 +166,20 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     []
   );
 
+  const advanceLevel = React.useCallback(
+    (newStage: TrustStage) => {
+      setTrustStage("calendaring", newStage);
+      setInteractionsAtLevel(0);
+      const stageName = TRUST_STAGE_LABELS[newStage];
+      addAgentMessage(
+        `I've earned enough trust to advance.\n\nI'm now at **Stage ${newStage}: ${stageName}**. I have new capabilities — ask me what's changed.`,
+        undefined,
+        1200
+      );
+    },
+    [setTrustStage, addAgentMessage]
+  );
+
   const sendMessage = React.useCallback(
     (content: string) => {
       // Add user message
@@ -271,21 +285,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         });
       }
     },
-    [trustStage, onboardingStep, addAgentMessage, setTrustStage, interactionsAtLevel]
-  );
-
-  const advanceLevel = React.useCallback(
-    (newStage: TrustStage) => {
-      setTrustStage("calendaring", newStage);
-      setInteractionsAtLevel(0);
-      const stageName = TRUST_STAGE_LABELS[newStage];
-      addAgentMessage(
-        `I've earned enough trust to advance.\n\nI'm now at **Stage ${newStage}: ${stageName}**. I have new capabilities — ask me what's changed.`,
-        undefined,
-        1200
-      );
-    },
-    [setTrustStage, addAgentMessage]
+    [trustStage, onboardingStep, addAgentMessage, setTrustStage, interactionsAtLevel, advanceLevel]
   );
 
   // Atomic snapshot loader for demo controller
