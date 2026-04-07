@@ -14,7 +14,8 @@ interface WeekViewProps {
 
 export function WeekView({ onEventClick, onSlotClick }: WeekViewProps) {
   const { currentDate } = useCalendar();
-  const days = getWeekDays(currentDate);
+  // Show Mon–Fri only (5 days) for readability in the split-view layout
+  const days = getWeekDays(currentDate).slice(0, 5);
 
   return (
     <div className="flex h-full flex-col">
@@ -31,12 +32,12 @@ export function WeekView({ onEventClick, onSlotClick }: WeekViewProps) {
                   "flex-1 border-r border-border last:border-r-0 px-2 py-2 text-center",
                 )}
               >
-                <div className="text-[10px] uppercase text-muted-foreground">
+                <div className="text-xs uppercase tracking-wide text-muted-foreground">
                   {format(day, "EEE")}
                 </div>
                 <div
                   className={cn(
-                    "mt-0.5 inline-flex h-7 w-7 items-center justify-center rounded-full text-sm font-medium",
+                    "mt-0.5 inline-flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium",
                     today
                       ? "bg-primary text-primary-foreground"
                       : "text-foreground"

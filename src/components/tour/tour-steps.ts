@@ -1,0 +1,266 @@
+import type { TrustStage } from "@/lib/agents/data";
+
+export interface TourStep {
+  id: string;
+  narratorTitle: string;
+  narratorBody: string;
+  narratorPosition: "top-left" | "top-right" | "bottom-left" | "bottom-right" | "center";
+  spotlightSelector?: string;
+  spotlightPadding?: number;
+  route?: string;
+  trustStage?: TrustStage;
+  xrayVisible?: boolean;
+  chatMessage?: string;
+  waitForAction?: "click" | "chat-reply" | "none";
+  actionTarget?: string;
+  actionHint?: string;
+  autoAdvanceMs?: number;
+  quickReplies?: string[];
+  onboardingQuestion?: boolean;
+}
+
+export const TOUR_STEPS: TourStep[] = [
+  // ── Act 1: The Platform ──────────────────────────────────────────────────
+  {
+    id: "title-card",
+    narratorTitle: "Claude Agents",
+    narratorBody: "AI that earns your trust over time. Meet your personal agent team — a set of AI agents that learn from you, share memory with each other, and unlock new capabilities as you build trust.",
+    narratorPosition: "center",
+    route: "/",
+    waitForAction: "none",
+  },
+  {
+    id: "onboarding-q1",
+    narratorTitle: "First, tell us about yourself.",
+    narratorBody: "This helps us recommend the right agents for your situation.",
+    narratorPosition: "center",
+    route: "/",
+    quickReplies: ["PM at a tech company", "Grad student", "Freelance designer"],
+    onboardingQuestion: true,
+    waitForAction: "none",
+  },
+  {
+    id: "onboarding-q2",
+    narratorTitle: "What's the hardest thing to manage in your day?",
+    narratorBody: "Be honest — this shapes which agents you'll find most useful.",
+    narratorPosition: "center",
+    route: "/",
+    quickReplies: ["7 calendars across work and family", "Dissertation + teaching + training", "Clients + shared custody + taxes"],
+    onboardingQuestion: true,
+    waitForAction: "none",
+  },
+  {
+    id: "onboarding-q3",
+    narratorTitle: "What would you protect at all costs?",
+    narratorBody: "This becomes a hard constraint your agents will always respect.",
+    narratorPosition: "center",
+    route: "/",
+    quickReplies: ["Evenings with my kids (5–7:30pm)", "Weekend long runs", "Fridays with my kids"],
+    onboardingQuestion: true,
+    waitForAction: "none",
+  },
+  {
+    id: "marketplace-intro",
+    narratorTitle: "Your Recommended Agents",
+    narratorBody: "Based on what you told us, here's your starter team. These agents share a unified memory — what one learns helps all the others. Each starts at Level 0 with no access.",
+    narratorPosition: "top-left",
+    route: "/",
+    spotlightSelector: "[data-tour='agent-grid']",
+    spotlightPadding: 16,
+    waitForAction: "none",
+  },
+  {
+    id: "agent-card-explained",
+    narratorTitle: "Every agent follows the same trust model",
+    narratorBody: "Each agent starts at Level 0: read-only, no actions. As you interact, it earns new capabilities. The trust badge shows where it is in that progression.",
+    narratorPosition: "top-right",
+    spotlightSelector: "[data-tour='agent-card-fitness']",
+    spotlightPadding: 12,
+    waitForAction: "none",
+  },
+  {
+    id: "nudge-calendaring",
+    narratorTitle: "Let's start with your calendar agent",
+    narratorBody: "It touches everything — 7 calendar sources, coordinates with every other agent. It's also where trust progression is most visible. Click to open it.",
+    narratorPosition: "bottom-right",
+    spotlightSelector: "[data-tour='agent-card-calendaring']",
+    spotlightPadding: 12,
+    waitForAction: "click",
+    actionTarget: "[data-tour='agent-card-calendaring']",
+    actionHint: "Click to open",
+  },
+  {
+    id: "enter-agent",
+    narratorTitle: "The Calendar Agent Workspace",
+    narratorBody: "Right now it's at Level 0: it can see your schedule but can't change anything. On the left is your chat with the agent. On the right is your calendar — the work surface.",
+    narratorPosition: "bottom-left",
+    route: "/agents/calendaring",
+    trustStage: 0 as TrustStage,
+    xrayVisible: false,
+    spotlightSelector: "[data-tour='calendar-artifact']",
+    spotlightPadding: 16,
+    waitForAction: "none",
+  },
+  // ── Act 2: Building Trust ────────────────────────────────────────────────
+  {
+    id: "chat-intro",
+    narratorTitle: "The agent starts by learning",
+    narratorBody: "It'll ask a few questions to understand your scheduling life. These answers directly shape what it can do — they're stored in its memory and shared with other agents.",
+    narratorPosition: "bottom-right",
+    trustStage: 0 as TrustStage,
+    spotlightSelector: "[data-tour='chat-panel']",
+    spotlightPadding: 12,
+    waitForAction: "none",
+  },
+  {
+    id: "onboarding-chat",
+    narratorTitle: "Answer honestly",
+    narratorBody: "Click a quick reply to see how the agent builds its understanding. Each answer gets stored in memory and shapes future behavior.",
+    narratorPosition: "bottom-right",
+    trustStage: 0 as TrustStage,
+    spotlightSelector: "[data-tour='chat-panel']",
+    spotlightPadding: 12,
+    waitForAction: "chat-reply",
+  },
+  {
+    id: "level-1",
+    narratorTitle: "Level 1: Informed Observer",
+    narratorBody: "The agent now understands your basics. It can read all 7 calendars, answer questions, detect conflicts. But it still can't change anything. Notice the trust badge updated.",
+    narratorPosition: "bottom-right",
+    trustStage: 1 as TrustStage,
+    spotlightSelector: "[data-tour='chat-panel']",
+    spotlightPadding: 12,
+    waitForAction: "none",
+  },
+  {
+    id: "xray-intro",
+    narratorTitle: "X-Ray Mode: Under the Hood",
+    narratorBody: "This panel shows what's actually happening at the model layer: the system prompt, the full context window, confidence scoring, and which capabilities are unlocked or locked.",
+    narratorPosition: "top-left",
+    xrayVisible: true,
+    spotlightSelector: "[data-tour='xray-panel']",
+    spotlightPadding: 8,
+    waitForAction: "none",
+  },
+  {
+    id: "context-window-l1",
+    narratorTitle: "Context Window at Level 1",
+    narratorBody: "About 30,000 tokens of context. Calendar data from 7 sources, your stated preferences, and a small amount of shared memory from the Fitness Coach agent you also added.",
+    narratorPosition: "top-left",
+    xrayVisible: true,
+    waitForAction: "none",
+  },
+  {
+    id: "capability-gates-l1",
+    narratorTitle: "5 Capabilities Unlocked, 17 Locked",
+    narratorBody: "The locked ones aren't hidden — you can see exactly what's gated and why. Event creation requires observed preference accuracy above 70%. Trust gates aren't arbitrary: they map to real confidence thresholds.",
+    narratorPosition: "top-left",
+    xrayVisible: true,
+    waitForAction: "none",
+  },
+  {
+    id: "level-2",
+    narratorTitle: "Level 2: Pattern Recognition",
+    narratorBody: "After a week of observation. Context grew to ~50,000 tokens. The agent now recognizes your energy patterns: Wednesday mornings are your most productive time. Shared memory from Friend Keeper and Spending Tracker flows in.",
+    narratorPosition: "top-left",
+    trustStage: 2 as TrustStage,
+    xrayVisible: true,
+    waitForAction: "none",
+  },
+  {
+    id: "level-3-health",
+    narratorTitle: "Level 3: The Schedule Health Score",
+    narratorBody: "The agent synthesizes across calendars to score your schedule: 62/100, down from 71. It flags that you're solo parenting this week and your Tuesday is dangerously packed.",
+    narratorPosition: "top-left",
+    trustStage: 3 as TrustStage,
+    xrayVisible: true,
+    chatMessage: "Schedule health: **62/100** (down from 71 last week).\n\nBreakdown:\n• **Meeting load** is normal (18 hrs, your average)\n• **Personal time** is compressed — you're solo parenting Mon-Wed with Allegra traveling, which means zero buffer\n• **Focus blocks** — none longer than 90 min this week\n\nBiggest risk: Tuesday is your anniversary and your densest meeting day. If anything runs long, your evening is gone.",
+    waitForAction: "none",
+  },
+  {
+    id: "context-growing",
+    narratorTitle: "Context is Growing",
+    narratorBody: "~74,000 tokens now. Shared memory from Sleep Coach, Fitness Coach, Friend Keeper, Spending Tracker all contributing. The calendaring agent isn't just reading your calendar — it's reasoning across your entire life.",
+    narratorPosition: "top-left",
+    trustStage: 3 as TrustStage,
+    xrayVisible: true,
+    waitForAction: "none",
+  },
+  // ── Act 3: The Payoff ────────────────────────────────────────────────────
+  {
+    id: "anniversary-conflict",
+    narratorTitle: "Level 4: The Anniversary Conflict",
+    narratorBody: "This is the moment progressive trust earns its name. A meeting request for 6:30pm on your anniversary. The agent knows Allegra is Tier 1 (partner), Azita is Tier 4. It recommends declining and proposes Thursday 11am.",
+    narratorPosition: "top-right",
+    trustStage: 4 as TrustStage,
+    xrayVisible: false,
+    chatMessage: "You just got a meeting request for Tuesday 6:30–7:30pm: 'Product Strategy Review' from Azita, marked urgent. I'd push back. Here's why:\n\n1. Tuesday is your anniversary (Heath Fam calendar).\n2. Dad mode starts at 5pm — you're solo parenting this week.\n3. Even if you could attend, you'd miss bath time and dinner.\n\nI can suggest Thursday 11am instead — you have a gap between Lena's 1:1 and your afternoon meetings, and Azita is free then too. Want me to propose the reschedule?",
+    waitForAction: "none",
+  },
+  {
+    id: "autonomous-action",
+    narratorTitle: "At Level 4, the agent can act",
+    narratorBody: "It declined the meeting, suggested an alternative, and blocked your evening. The message it sent is professional and doesn't reveal personal details. This is what progressive trust enables: actions you'd approve of, taken before you have to ask.",
+    narratorPosition: "top-right",
+    trustStage: 4 as TrustStage,
+    chatMessage: "I declined the Product Strategy Review on your behalf. Here's what I sent to Azita:\n\n> \"James has a personal commitment Tuesday evening that he can't move. He's available Thursday 11am–12pm if that works for the team, or he can review materials async Wednesday and send comments by EOD.\"\n\nI also blocked 5:30–9:00pm on your work calendar as \"Personal — Anniversary\" so nothing else lands there.\n\nHappy anniversary, by the way.",
+    waitForAction: "none",
+  },
+  {
+    id: "xray-why-it-works",
+    narratorTitle: "X-Ray: Why This Works",
+    narratorBody: "~101,000 tokens of context, 6 contributing agents, relationship tier data, confidence 97%. This isn't retrieval. It's cross-domain reasoning over heterogeneous personal context. That's the capability prediction.",
+    narratorPosition: "top-left",
+    trustStage: 4 as TrustStage,
+    xrayVisible: true,
+    waitForAction: "none",
+  },
+  {
+    id: "level-5-burnout",
+    narratorTitle: "Level 5: Burnout Detection",
+    narratorBody: "The agent correlates 5 signals across 4 data sources: dog walks dropping, focus blocks overwritten, Dad mode creeping, social calendar empty, meeting decline rate spiking. None alarming alone. Together, they tell a story.",
+    narratorPosition: "top-right",
+    trustStage: 5 as TrustStage,
+    xrayVisible: false,
+    chatMessage: "I'm seeing some patterns I want to flag. Over the last 3 weeks:\n\n1. **Copper walks dropped from 5/week to 3/week.** You used to alternate with Allegra, but you've been skipping yours on office days.\n2. **Focus blocks are getting overwritten.** 4 weeks ago you had 8 hrs/week of protected DNS time. Last week: 3 hrs.\n3. **Dad mode is creeping.** Twice last week you had work messages after 7:30pm.\n4. **Social calendar is empty.** No dinners with friends, no date night, no Havdalah attendance in 2 weeks.\n5. **Meeting decline rate spiked.** You declined 8 meetings last week (vs. average of 4).\n\nNone of these alone is alarming. Together, they suggest you're running hot. Want me to protect Friday as a reset day?",
+    waitForAction: "none",
+  },
+  {
+    id: "full-context",
+    narratorTitle: "The Full Context",
+    narratorBody: "~132,800 tokens. System prompt, 7 calendar sources, user preferences, shared memory from 7 agents, conversation history. Progressive trust creates a flywheel: more trust → more data shared → better reasoning → more trust.",
+    narratorPosition: "top-left",
+    trustStage: 5 as TrustStage,
+    xrayVisible: true,
+    waitForAction: "none",
+  },
+  // ── Act 4: The Platform Argument ─────────────────────────────────────────
+  {
+    id: "back-to-marketplace",
+    narratorTitle: "Every agent follows this model",
+    narratorBody: "The calendaring agent went from read-only to autonomous in 5 levels. Now imagine this across your whole life: finances, fitness, relationships, career. Same trust model. Different domains.",
+    narratorPosition: "top-left",
+    route: "/",
+    xrayVisible: false,
+    spotlightSelector: "[data-tour='agent-grid']",
+    spotlightPadding: 16,
+    waitForAction: "none",
+  },
+  {
+    id: "persona-switcher",
+    narratorTitle: "Different person, same model",
+    narratorBody: "Priya is a grad student training for a marathon with a long-distance relationship. Her recommended agents shift — but the mechanics are identical. This is a platform, not a feature.",
+    narratorPosition: "top-right",
+    route: "/",
+    waitForAction: "none",
+  },
+  {
+    id: "end-card",
+    narratorTitle: "Claude Agents",
+    narratorBody: "AI that earns your trust over time.\n\nProgressive trust isn't just a safety concept. It's a product mechanic that makes AI better — more context, more capability, more value over time.\n\nBuilt as a prototype by James Heath.",
+    narratorPosition: "center",
+    route: "/",
+    xrayVisible: false,
+    waitForAction: "none",
+  },
+];
