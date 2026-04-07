@@ -18,11 +18,12 @@ export interface ChatMessage {
   quickReplies?: string[];
 }
 
-interface AgentMemory {
+export interface AgentMemory {
   chronotype?: string;
   meetingStyle?: string;
   protectedTime?: string;
   frustration?: string;
+  [key: string]: string | undefined;
 }
 
 interface ChatContextValue {
@@ -33,9 +34,20 @@ interface ChatContextValue {
   onboardingStep: number;
   isOnboarding: boolean;
   lastConfidence: { score: "high" | "medium" | "low"; reason: string } | null;
+  loadSnapshot?: (stage: TrustStage, snapshotMemory: AgentMemory, snapshotMessages: ChatMessage[]) => void;
 }
 
 const ChatContext = React.createContext<ChatContextValue | undefined>(undefined);
+
+const MEMORY_STORAGE_KEY = "claude-agent-memory";
+const MESSAGES_STORAGE_KEY = "claude-agent-messages";
+
+function dateReviver(_key: string, value: unknown) {
+  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}T/.test(value)) {
+    return new Date(value);
+  }
+  return value;
+}
 
 export function ChatProvider({ children }: { children: React.ReactNode }) {
   const [messages, setMessages] = React.useState<ChatMessage[]>([]);
@@ -47,15 +59,43 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     score: "high" | "medium" | "low";
     reason: string;
   } | null>(null);
-  const { getTrustStage, setTrustStage, isOnTeam } = useTeam();
+  const { getTrustStage, setTrustStage, isOnTeam, mounted } = useTeam();
 
   const trustStage = getTrustStage("calendaring");
 
-  // Send the first onboarding message
+  // Persist memory to localStorage
+  React.useEffect(() => {
+    if (Object.keys(memory).length > 0) {
+      localStorage.setItem(MEMORY_STORAGE_KEY, JSON.stringify(memory));
+    }
+  }, [memory]);
+
+  // Persist messages to localStorage
+  React.useEffect(() => {
+    if (messages.length > 0) {
+      localStorage.setItem(MESSAGES_STORAGE_KEY, JSON.stringify(messages));
+    }
+  }, [messages]);
+
+  // Initialize: load from localStorage or start onboarding
   const onTeam = isOnTeam("calendaring");
   React.useEffect(() => {
-    if (initializedRef.current || !onTeam) return;
+    if (initializedRef.current || !onTeam || !mounted) return;
     initializedRef.current = true;
+
+    // Try to load persisted state
+    const savedMemory = localStorage.getItem(MEMORY_STORAGE_KEY);
+    const savedMessages = localStorage.getItem(MESSAGES_STORAGE_KEY);
+
+    if (savedMemory && trustStage >= 1) {
+      // Returning user — restore state, skip onboarding
+      setMemory(JSON.parse(savedMemory));
+      if (savedMessages) {
+        setMessages(JSON.parse(savedMessages, dateReviver));
+      }
+      setOnboardingStep(-1); // onboarding complete
+      return;
+    }
 
     if (trustStage === 0) {
       const firstMsg = ONBOARDING_SCRIPT[0].agentMessage;
@@ -74,7 +114,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         setOnboardingStep(1);
       }, firstMsg.delayMs);
     }
-  }, [trustStage, onTeam]);
+  }, [trustStage, onTeam, mounted]);
 
   const addAgentMessage = React.useCallback(
     (content: string, quickReplies?: string[], delayMs: number = 600) => {
@@ -114,7 +154,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         // Handle onboarding flow
         const currentScript = ONBOARDING_SCRIPT[onboardingStep - 1];
         if (currentScript) {
-          // Store the user's answer
           const key = currentScript.responseKey;
           if (key !== "__intro__") {
             setMemory((prev) => ({ ...prev, [key]: content }));
@@ -122,7 +161,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         }
 
         if (onboardingStep < ONBOARDING_SCRIPT.length) {
-          // Next onboarding question
           const nextScript = ONBOARDING_SCRIPT[onboardingStep];
           const nextMsg = nextScript.agentMessage;
           setIsTyping(true);
@@ -145,7 +183,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
           const lastScript = ONBOARDING_SCRIPT[ONBOARDING_SCRIPT.length - 1];
           setMemory((prev) => ({ ...prev, [lastScript.responseKey]: content }));
 
-          // Onboarding complete → advance to stage 1
           const completeMsg = ONBOARDING_COMPLETE_MESSAGE;
           setIsTyping(true);
           setTimeout(() => {
@@ -160,7 +197,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
             ]);
             setIsTyping(false);
             setTrustStage("calendaring", 1 as TrustStage);
-            setOnboardingStep(-1); // Done
+            setOnboardingStep(-1);
           }, completeMsg.delayMs);
         }
       } else if (trustStage >= 1) {
@@ -171,7 +208,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
             r.triggers.some((t) => lowerContent.includes(t))
           ) ?? STAGE_1_FALLBACK;
 
-        // Fill in template variables
         let responseContent = match.content
           .replace("{eventCount}", "23")
           .replace("{meetingCount}", "15")
@@ -189,6 +225,26 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     [trustStage, onboardingStep, addAgentMessage, setTrustStage]
   );
 
+  // Atomic snapshot loader for demo controller
+  const loadSnapshot = React.useCallback(
+    (stage: TrustStage, snapshotMemory: AgentMemory, snapshotMessages: ChatMessage[]) => {
+      const now = new Date();
+      const timestampedMessages = snapshotMessages.map((msg, i) => ({
+        ...msg,
+        timestamp: new Date(now.getTime() - (snapshotMessages.length - i) * 60000),
+      }));
+      setMessages(timestampedMessages);
+      setMemory(snapshotMemory);
+      setTrustStage("calendaring", stage);
+      setOnboardingStep(stage === 0 ? 0 : -1);
+      setLastConfidence(null);
+      // Persist directly
+      localStorage.setItem(MEMORY_STORAGE_KEY, JSON.stringify(snapshotMemory));
+      localStorage.setItem(MESSAGES_STORAGE_KEY, JSON.stringify(timestampedMessages));
+    },
+    [setTrustStage]
+  );
+
   const isOnboarding = trustStage === 0 && onboardingStep >= 0;
 
   return (
@@ -201,6 +257,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         onboardingStep,
         isOnboarding,
         lastConfidence,
+        loadSnapshot,
       }}
     >
       {children}
