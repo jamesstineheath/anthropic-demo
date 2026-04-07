@@ -53,7 +53,7 @@ export function TimeGrid({ days, onEventClick, onSlotClick }: TimeGridProps) {
             className="relative border-b border-border"
             style={{ height: "72px" }}
           >
-            <span className="absolute -top-2.5 right-2 text-xs text-muted-foreground/70">
+            <span className="absolute -top-3 right-2 text-[10px] leading-none text-muted-foreground/60 bg-background px-0.5">
               {hour === 12 ? "12 PM" : hour > 12 ? `${hour - 12} PM` : `${hour} AM`}
             </span>
           </div>
