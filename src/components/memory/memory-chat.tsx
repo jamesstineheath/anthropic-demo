@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Plus, FolderOpen, AudioLines, ChevronDown, Sparkles, User } from "lucide-react";
+import { Plus, FolderOpen, AudioLines, ChevronDown, Brain, User } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { MEMORY_ITEMS } from "@/lib/memory/data";
@@ -135,7 +135,7 @@ export function MemoryChat() {
         {showEmptyState && (
           <div className="flex flex-col items-center justify-center h-full text-center px-6 space-y-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-              <Sparkles className="h-5 w-5 text-primary" />
+              <Brain className="h-5 w-5 text-primary" />
             </div>
             <div className="space-y-1.5">
               <p className="text-sm font-medium text-foreground">

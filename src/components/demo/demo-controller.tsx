@@ -28,8 +28,8 @@ function ArrowButton({
       onClick={onClick}
       className={cn(
         "flex h-8 w-8 items-center justify-center rounded-md",
-        "border border-zinc-700 bg-zinc-800 text-zinc-400",
-        "hover:bg-zinc-700 hover:text-zinc-100 active:bg-zinc-600",
+        "border border-zinc-700 bg-zinc-800 text-zinc-300",
+        "hover:bg-zinc-700 hover:text-white active:bg-zinc-600",
         "transition-colors",
         className
       )}
@@ -50,7 +50,7 @@ export function DemoController() {
   React.useEffect(() => {
     setPosition({
       x: window.innerWidth - 230,
-      y: window.innerHeight - 220,
+      y: 16,
     });
   }, []);
 
@@ -107,7 +107,7 @@ export function DemoController() {
           className="w-full flex items-center justify-between cursor-grab"
           onMouseDown={handleMouseDown}
         >
-          <span className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-zinc-300">
             Demo Navigator
           </span>
           <div className="flex items-center gap-0.5">
@@ -116,8 +116,8 @@ export function DemoController() {
               className={cn(
                 "flex h-5 w-5 items-center justify-center rounded transition-colors",
                 tourCardsHidden
-                  ? "text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800"
-                  : "text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800"
+                  ? "text-zinc-400 hover:text-white hover:bg-zinc-800"
+                  : "text-zinc-400 hover:text-white hover:bg-zinc-800"
               )}
               title={tourCardsHidden ? "Show tour cards" : "Hide tour cards"}
             >
@@ -129,7 +129,7 @@ export function DemoController() {
             </button>
             <button
               onClick={() => { goToStep(0); setMode("tour"); }}
-              className="flex h-5 w-5 items-center justify-center rounded text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
+              className="flex h-5 w-5 items-center justify-center rounded text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
               title="Reset tour"
             >
               <RotateCcw className="h-3 w-3" />
@@ -146,8 +146,8 @@ export function DemoController() {
               className={cn(
                 "px-3 py-1 text-xs font-medium rounded-md transition-all",
                 mode === m
-                  ? "bg-zinc-700 text-zinc-100 shadow-sm"
-                  : "text-zinc-500 hover:text-zinc-300"
+                  ? "bg-zinc-700 text-white shadow-sm"
+                  : "text-zinc-400 hover:text-white"
               )}
             >
               {MODE_LABELS[m]}
@@ -156,7 +156,7 @@ export function DemoController() {
         </div>
 
         {/* Step indicator */}
-        <div className="text-[10px] text-zinc-500 font-medium tabular-nums">
+        <div className="text-[10px] text-zinc-400 font-medium tabular-nums">
           {stepIndex + 1} / {totalSteps} · {currentStep.label}
         </div>
 

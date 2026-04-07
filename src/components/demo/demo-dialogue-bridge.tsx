@@ -29,7 +29,10 @@ export function DemoDialogueBridge() {
 
     if (!hasInitRef.current || isStepChange) {
       hasInitRef.current = true;
-      lastInjectedRef.current = 0;
+      // Sync to current visibleDialogue length so the injection effect
+      // doesn't re-inject stale messages from the previous step
+      // (child effects run before parent, so DemoProvider hasn't reset yet)
+      lastInjectedRef.current = visibleDialogue.length;
 
       if (mode === "tour") {
         clearMessages();
@@ -52,7 +55,7 @@ export function DemoDialogueBridge() {
         }
       }
     }
-  }, [stepIndex, mode, currentStep.continueDialogue, clearMessages, addMessage]);
+  }, [stepIndex, mode, currentStep.continueDialogue, clearMessages, addMessage, visibleDialogue]);
 
   // Sync typing indicator from demo to chat
   React.useEffect(() => {
@@ -63,6 +66,11 @@ export function DemoDialogueBridge() {
   // Inject new dialogue entries into the chat panel as they appear
   React.useEffect(() => {
     if (mode !== "tour" || !currentStep.dialogue?.length) return;
+
+    // Detect DemoProvider reset (visibleDialogue shrunk after step change)
+    if (visibleDialogue.length < lastInjectedRef.current) {
+      lastInjectedRef.current = 0;
+    }
 
     const newMessages = visibleDialogue.slice(lastInjectedRef.current);
     for (const msg of newMessages) {

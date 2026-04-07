@@ -6,7 +6,7 @@ import { useDemo } from "@/components/demo/demo-provider";
 
 const INITIAL_POSITIONS: Record<string, { x: number; y: number }> = {
   "top-left": { x: 280, y: 56 },
-  "top-right": { x: -1, y: 56 },    // -1 = compute from right edge
+  "top-right": { x: -1, y: -1 },    // renders bottom-right so navigator stays top-right
   "bottom-left": { x: 24, y: -1 },   // -1 = compute from bottom edge
   "bottom-right": { x: -1, y: -1 },
   center: { x: -2, y: -2 },          // -2 = center
