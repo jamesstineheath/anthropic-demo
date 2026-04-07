@@ -4,6 +4,7 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { TOUR_STEPS } from "@/components/tour/tour-steps";
 import type { TourStep } from "@/components/tour/tour-steps";
+import { useXRay } from "@/components/providers/xray-provider";
 
 interface TourContextValue {
   isActive: boolean;
@@ -24,6 +25,7 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
   const [isActive, setIsActive] = React.useState(false);
   const [stepIndex, setStepIndex] = React.useState(0);
   const router = useRouter();
+  const { setXrayVisible } = useXRay();
 
   const currentStep = TOUR_STEPS[stepIndex] ?? null;
 
@@ -36,15 +38,21 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Restore from URL hash
+  // Restore from URL hash (only if tour not explicitly completed)
   React.useEffect(() => {
     const hash = window.location.hash;
     const match = hash.match(/tour=(\d+)/);
     if (match) {
-      const idx = parseInt(match[1], 10);
-      if (!isNaN(idx) && idx < TOUR_STEPS.length) {
-        setStepIndex(idx);
-        setIsActive(true);
+      const complete = typeof window !== "undefined" && localStorage.getItem(TOUR_COMPLETE_KEY);
+      if (!complete) {
+        const idx = parseInt(match[1], 10);
+        if (!isNaN(idx) && idx < TOUR_STEPS.length) {
+          setStepIndex(idx);
+          setIsActive(true);
+        }
+      } else {
+        // Clean up the hash if tour is complete
+        window.history.replaceState(null, "", window.location.pathname);
       }
     }
   }, []);
@@ -58,9 +66,14 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
       router.push(currentStep.route);
     }
 
+    // Apply xray visibility
+    if (currentStep.xrayVisible !== undefined) {
+      setXrayVisible(currentStep.xrayVisible);
+    }
+
     // Persist step in URL hash
     window.history.replaceState(null, "", `${window.location.pathname}#tour=${stepIndex}`);
-  }, [stepIndex, isActive, currentStep, router]);
+  }, [stepIndex, isActive, currentStep, router, setXrayVisible]);
 
   const next = React.useCallback(() => {
     setStepIndex((prev) => {
@@ -108,4 +121,39 @@ export function useTour() {
   const context = React.useContext(TourContext);
   if (!context) throw new Error("useTour must be used within TourProvider");
   return context;
+}
+
+/**
+ * Hook for the calendaring page to apply tour-driven state changes
+ * (trust stage, chat message injection) that require local providers.
+ */
+export function useTourCalendaringEffects(
+  loadSnapshot: ((stage: import("@/lib/agents/data").TrustStage, mem: import("@/components/providers/chat-provider").AgentMemory, msgs: import("@/components/providers/chat-provider").ChatMessage[]) => void) | undefined,
+  addMessage: ((msg: { role: "user" | "agent"; content: string; quickReplies?: string[] }) => void) | undefined,
+) {
+  const { isActive, stepIndex, currentStep } = useTour();
+  const appliedStepRef = React.useRef(-1);
+
+  React.useEffect(() => {
+    if (!isActive || !currentStep || appliedStepRef.current === stepIndex) return;
+    appliedStepRef.current = stepIndex;
+
+    // Apply trust stage snapshot
+    if (currentStep.trustStage !== undefined && loadSnapshot) {
+      // Import snapshots lazily to avoid circular deps
+      import("@/lib/demo/snapshots").then(({ DEMO_SNAPSHOTS }) => {
+        const snap = DEMO_SNAPSHOTS[currentStep.trustStage!];
+        if (snap) {
+          loadSnapshot(snap.trustStage, snap.memory, snap.messages);
+        }
+      });
+    }
+
+    // Inject chat message
+    if (currentStep.chatMessage && addMessage) {
+      setTimeout(() => {
+        addMessage({ role: "agent", content: currentStep.chatMessage! });
+      }, 400);
+    }
+  }, [stepIndex, isActive, currentStep, loadSnapshot, addMessage]);
 }

@@ -3,12 +3,19 @@
 import React from "react";
 import { Calendar } from "lucide-react";
 import { CalendarProvider } from "@/components/providers/calendar-provider";
-import { ChatProvider } from "@/components/providers/chat-provider";
+import { ChatProvider, useChat } from "@/components/providers/chat-provider";
 import { useTeam } from "@/components/providers/team-provider";
 import { CalendarShell } from "@/components/calendar/calendar-shell";
 import { ChatPanel } from "@/components/chat-panel";
 import { XRayOverlay } from "@/components/xray-overlay";
 import { DemoController } from "@/components/demo-controller";
+import { useTourCalendaringEffects } from "@/components/providers/tour-provider";
+
+function CalendaringInner() {
+  const { loadSnapshot, addMessage } = useChat();
+  useTourCalendaringEffects(loadSnapshot, addMessage);
+  return null;
+}
 
 export default function CalendaringPage() {
   const { isOnTeam, addAgent } = useTeam();
@@ -22,6 +29,7 @@ export default function CalendaringPage() {
   return (
     <CalendarProvider>
       <ChatProvider>
+        <CalendaringInner />
         <div className="flex h-full overflow-hidden">
           {/* Chat stream — left side, ~40% */}
           <div
