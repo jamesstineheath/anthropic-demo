@@ -80,6 +80,12 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
+    // If in model mode but step has no model content, fall back to tour
+    if (mode === "model" && !currentStep.model) {
+      setModeState("tour");
+      return;
+    }
+
     // Show x-ray only in model mode
     setXrayVisible(mode === "model");
 

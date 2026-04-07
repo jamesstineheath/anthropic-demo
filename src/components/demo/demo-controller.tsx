@@ -12,8 +12,6 @@ const MODE_LABELS: Record<DemoMode, string> = {
   model: "Model",
 };
 
-const MODES: DemoMode[] = ["tour", "interact", "model"];
-
 function ArrowButton({
   onClick,
   children,
@@ -41,6 +39,12 @@ function ArrowButton({
 
 export function DemoController() {
   const { mode, setMode, stepIndex, totalSteps, currentStep, nextStep, prevStep, nextMode, prevMode, goToStep, tourCardsHidden, setTourCardsHidden } = useDemo();
+
+  // Only show Model mode when current step has model content
+  const availableModes: DemoMode[] = currentStep.model
+    ? ["tour", "interact", "model"]
+    : ["tour", "interact"];
+
   const [position, setPosition] = React.useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = React.useState(false);
   const dragStartRef = React.useRef({ x: 0, y: 0, posX: 0, posY: 0 });
@@ -139,7 +143,7 @@ export function DemoController() {
 
         {/* Mode selector bar */}
         <div className="flex items-center gap-0.5 rounded-lg border border-zinc-700 bg-zinc-900 p-0.5">
-          {MODES.map((m) => (
+          {availableModes.map((m) => (
             <button
               key={m}
               onClick={() => setMode(m)}

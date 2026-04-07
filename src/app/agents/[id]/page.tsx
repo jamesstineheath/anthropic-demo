@@ -52,16 +52,6 @@ export default async function AgentDetailPage({
         {agent.description}
       </p>
 
-      {/* Placeholder */}
-      <div className="mt-8 rounded-xl border border-dashed border-border p-8 text-center">
-        <p className="text-sm text-muted-foreground">
-          Agent detail view coming in Phase 2.
-        </p>
-        <p className="mt-1 text-xs text-muted-foreground/60">
-          This is where the agent&apos;s work surface, chat interface, and trust
-          progression will live.
-        </p>
-      </div>
     </div>
   );
 }

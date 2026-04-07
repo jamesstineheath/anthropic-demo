@@ -93,10 +93,10 @@ export default function MemoryPage() {
       >
         <MemoryChat />
 
-        {/* Toggle button for Explore Memory panel */}
+        {/* Toggle button for Explore Memory panel — vertically centered in the header row */}
         <button
           onClick={() => setGridOpen(!gridOpen)}
-          className="absolute top-2 right-3 flex items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors shadow-sm"
+          className="absolute top-0 right-0 h-[37px] flex items-center gap-1.5 border-b border-l border-border bg-background px-3 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors rounded-bl-lg"
         >
           <Brain className="h-3.5 w-3.5" />
           <span>Explore Memory</span>
