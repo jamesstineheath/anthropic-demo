@@ -240,7 +240,7 @@ export function MemoryBrowser() {
       {/* Header */}
       <div className="shrink-0 border-b border-border px-4 py-2 flex items-center justify-between gap-3">
         <span className="text-sm font-medium text-foreground shrink-0">
-          Knowledge Base
+          Explore Memory
         </span>
 
         {isSearchOpen ? (

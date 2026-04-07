@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { Brain, PanelRightOpen, PanelRightClose } from "lucide-react";
 import { MemoryChat } from "@/components/memory/memory-chat";
 import { MemoryGrid } from "@/components/memory/memory-grid";
 import { MemoryDetailSidebar } from "@/components/memory/memory-detail-sidebar";
@@ -10,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 
 export default function MemoryPage() {
+  const [gridOpen, setGridOpen] = React.useState(false);
   const [chatWidth, setChatWidth] = React.useState(420);
   const [selectedMemoryId, setSelectedMemoryId] = React.useState<string | null>(
     null
@@ -47,26 +49,44 @@ export default function MemoryPage() {
 
   return (
     <div ref={containerRef} className="flex h-full overflow-hidden">
-      {/* Chat — left side */}
+      {/* Chat — expands full width when grid is closed */}
       <div
-        className="flex shrink-0 flex-col bg-background"
-        style={{ width: chatWidth }}
+        className="flex flex-col bg-background relative"
+        style={gridOpen ? { width: chatWidth, flexShrink: 0 } : { flex: 1 }}
       >
         <MemoryChat />
+
+        {/* Toggle button for Explore Memory panel */}
+        <button
+          onClick={() => setGridOpen(!gridOpen)}
+          className="absolute top-2 right-3 flex items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors shadow-sm"
+        >
+          <Brain className="h-3.5 w-3.5" />
+          <span>Explore Memory</span>
+          {gridOpen ? (
+            <PanelRightClose className="h-3.5 w-3.5" />
+          ) : (
+            <PanelRightOpen className="h-3.5 w-3.5" />
+          )}
+        </button>
       </div>
 
-      {/* Draggable divider */}
-      <div
-        onMouseDown={handleMouseDown}
-        className="w-1 shrink-0 cursor-col-resize bg-border hover:bg-primary/30 transition-colors"
-      />
+      {gridOpen && (
+        <>
+          {/* Draggable divider */}
+          <div
+            onMouseDown={handleMouseDown}
+            className="w-1 shrink-0 cursor-col-resize bg-border hover:bg-primary/30 transition-colors"
+          />
 
-      {/* Knowledge browser — right side (full width now) */}
-      <MemoryGrid
-        selectedMemoryId={selectedMemoryId}
-        onSelectMemory={setSelectedMemoryId}
-        className="flex-1 min-w-0"
-      />
+          {/* Memory browser — right side */}
+          <MemoryGrid
+            selectedMemoryId={selectedMemoryId}
+            onSelectMemory={setSelectedMemoryId}
+            className="flex-1 min-w-0"
+          />
+        </>
+      )}
 
       {/* Detail modal */}
       <Dialog
