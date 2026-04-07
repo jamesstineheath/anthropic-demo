@@ -2,7 +2,7 @@
 
 import { format, isSameDay, addDays, startOfDay } from "date-fns";
 import { useCalendar } from "@/components/providers/calendar-provider";
-import { EVENT_CATEGORY_COLORS, type CalendarEvent } from "@/lib/calendar/data";
+import { getEventColors, type CalendarEvent } from "@/lib/calendar/data";
 import { cn } from "@/lib/utils";
 
 interface AgendaViewProps {
@@ -18,7 +18,7 @@ export function AgendaView({ onEventClick }: AgendaViewProps) {
   const eventsByDay = days.map((day) => ({
     date: day,
     events: events
-      .filter((e) => isSameDay(e.start, day))
+      .filter((e) => isSameDay(e.start, day) && !e.isDeclined)
       .sort((a, b) => a.start.getTime() - b.start.getTime()),
   }));
 
@@ -41,7 +41,7 @@ export function AgendaView({ onEventClick }: AgendaViewProps) {
             </div>
             <div className="flex-1 space-y-1.5">
               {dayEvents.map((event) => {
-                const colors = EVENT_CATEGORY_COLORS[event.category];
+                const colors = getEventColors(event);
                 return (
                   <div
                     key={event.id}

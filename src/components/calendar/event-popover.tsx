@@ -3,7 +3,7 @@
 import { format } from "date-fns";
 import { X, Clock, Tag, AlertTriangle, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { EVENT_CATEGORY_COLORS, type CalendarEvent } from "@/lib/calendar/data";
+import { getEventColors, type CalendarEvent } from "@/lib/calendar/data";
 import { cn } from "@/lib/utils";
 
 interface EventPopoverProps {
@@ -13,7 +13,7 @@ interface EventPopoverProps {
 }
 
 export function EventPopover({ event, onClose, onEdit }: EventPopoverProps) {
-  const colors = EVENT_CATEGORY_COLORS[event.category];
+  const colors = getEventColors(event);
 
   return (
     <div className="w-72 rounded-xl border border-border bg-card p-4 shadow-lg">
@@ -57,7 +57,7 @@ export function EventPopover({ event, onClose, onEdit }: EventPopoverProps) {
               colors.darkText
             )}
           >
-            {event.category}
+            {event.calendarSource === "heathFam" ? "Heath Fam" : event.calendarSource}
           </span>
         </div>
 

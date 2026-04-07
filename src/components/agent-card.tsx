@@ -13,9 +13,10 @@ import { cn } from "@/lib/utils";
 interface AgentCardProps {
   agent: Agent;
   featured?: boolean;
+  viewOnly?: boolean;
 }
 
-export function AgentCard({ agent, featured }: AgentCardProps) {
+export function AgentCard({ agent, featured, viewOnly }: AgentCardProps) {
   const { isOnTeam, addAgent, removeAgent, getTrustStage } = useTeam();
   const onTeam = isOnTeam(agent.id);
   const trustStage = getTrustStage(agent.id);
@@ -78,7 +79,11 @@ export function AgentCard({ agent, featured }: AgentCardProps) {
             {agent.category}
           </Badge>
 
-          {onTeam ? (
+          {viewOnly ? (
+            <span className="text-[10px] text-muted-foreground/50 italic">
+              Switch to James to interact
+            </span>
+          ) : onTeam ? (
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-medium text-primary">
                 Stage {trustStage}: {TRUST_STAGE_LABELS[trustStage]}
@@ -115,7 +120,7 @@ export function AgentCard({ agent, featured }: AgentCardProps) {
     </Card>
   );
 
-  if (onTeam) {
+  if (onTeam && !viewOnly) {
     return <Link href={`/agents/${agent.id}`}>{cardContent}</Link>;
   }
 
