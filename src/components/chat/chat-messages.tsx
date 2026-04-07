@@ -43,7 +43,7 @@ const STAGE_PROMPTS: Record<number, string[]> = {
 export function ChatMessages() {
   const { messages, sendMessage, isTyping } = useChat();
   const { getTrustStage } = useTeam();
-  const { mode } = useDemo();
+  const { mode, currentStep } = useDemo();
   const scrollRef = useRef<HTMLDivElement>(null);
   const trustStage = getTrustStage("calendaring");
 
@@ -53,7 +53,9 @@ export function ChatMessages() {
     }
   }, [messages, isTyping]);
 
-  if (messages.length === 0 && !isTyping) {
+  // Don't flash the empty/landing state during tour dialogue transitions
+  const tourHasDialogue = mode === "tour" && !!currentStep.dialogue?.length;
+  if (messages.length === 0 && !isTyping && !tourHasDialogue) {
     const stageDetails = TRUST_STAGE_DETAILS[trustStage];
     const prompts = STAGE_PROMPTS[trustStage] || STAGE_PROMPTS[1];
 

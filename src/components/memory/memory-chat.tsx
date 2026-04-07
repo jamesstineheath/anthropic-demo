@@ -183,7 +183,8 @@ export function MemoryChat() {
     handleSend(input);
   };
 
-  const showEmptyState = displayMessages.length === 0 && !displayIsTyping;
+  // Never show landing state during tour mode — avoids flash between steps
+  const showEmptyState = displayMessages.length === 0 && !displayIsTyping && !isTourOnMemory;
 
   return (
     <div className="flex h-full flex-col">

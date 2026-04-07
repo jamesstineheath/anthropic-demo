@@ -101,13 +101,19 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
 
     // Clear previous dialogue
     setVisibleDialogue([]);
-    setIsTyping(false);
     if (dialogueTimerRef.current) clearTimeout(dialogueTimerRef.current);
 
-    if (mode !== "tour" || !currentStep.dialogue?.length) return;
+    if (mode !== "tour" || !currentStep.dialogue?.length) {
+      setIsTyping(false);
+      return;
+    }
 
     const dialogue = currentStep.dialogue;
     let index = 0;
+
+    // Show typing indicator immediately (no initial delay) to avoid
+    // flashing the empty/landing state between steps
+    setIsTyping(true);
 
     const playNext = () => {
       if (index >= dialogue.length) {
@@ -116,8 +122,9 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
       }
 
       const entry = dialogue[index];
-      const typingDelay = entry.role === "user" ? 1500 : 800;
-      const messageDelay = entry.role === "user" ? 600 : 400;
+      // Fast typing animation for smooth step transitions
+      const typingDelay = entry.role === "user" ? 600 : 400;
+      const messageDelay = 200;
 
       // Show typing indicator
       setIsTyping(true);
@@ -129,14 +136,14 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
         dialogueTimerRef.current = setTimeout(() => {
           setVisibleDialogue((prev) => [...prev, entry]);
           index++;
-          // Play next after a pause
-          dialogueTimerRef.current = setTimeout(playNext, 800);
+          // Play next after a brief pause
+          dialogueTimerRef.current = setTimeout(playNext, 300);
         }, messageDelay);
       }, typingDelay);
     };
 
-    // Start after a short delay
-    dialogueTimerRef.current = setTimeout(playNext, 600);
+    // Start quickly — typing indicator is already showing
+    dialogueTimerRef.current = setTimeout(playNext, 150);
 
     return () => {
       if (dialogueTimerRef.current) clearTimeout(dialogueTimerRef.current);
