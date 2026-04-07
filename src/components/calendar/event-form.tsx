@@ -68,6 +68,7 @@ export function EventForm({
         start,
         end,
         category,
+        calendarSource: "personal",
         description,
       });
     }

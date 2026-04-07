@@ -4,7 +4,7 @@ import { format, isToday, getHours, getMinutes } from "date-fns";
 import { useCalendar } from "@/components/providers/calendar-provider";
 import { getEventsForDay, HOURS } from "@/lib/calendar/utils";
 import {
-  EVENT_CATEGORY_COLORS,
+  getEventColors,
   type CalendarEvent,
 } from "@/lib/calendar/data";
 import { cn } from "@/lib/utils";
@@ -94,7 +94,8 @@ export function TimeGrid({ days, onEventClick, onSlotClick }: TimeGridProps) {
                   if (startHour < 7 || startHour > 22) return null;
                   const top = ((startHour - 7) / 15) * 100;
                   const height = ((endHour - startHour) / 15) * 100;
-                  const colors = EVENT_CATEGORY_COLORS[event.category];
+                  if (event.isDeclined) return null;
+                  const colors = getEventColors(event);
 
                   return (
                     <div

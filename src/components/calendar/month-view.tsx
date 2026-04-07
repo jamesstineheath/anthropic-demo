@@ -3,7 +3,7 @@
 import { format, isToday, isSameMonth, isSameDay } from "date-fns";
 import { useCalendar } from "@/components/providers/calendar-provider";
 import { getMonthDays, getEventsForDay } from "@/lib/calendar/utils";
-import { EVENT_CATEGORY_COLORS, type CalendarEvent } from "@/lib/calendar/data";
+import { getEventColors, type CalendarEvent } from "@/lib/calendar/data";
 import { cn } from "@/lib/utils";
 
 interface MonthViewProps {
@@ -58,8 +58,8 @@ export function MonthView({ onEventClick, onDayClick }: MonthViewProps) {
                 {format(day, "d")}
               </div>
               <div className="space-y-0.5">
-                {dayEvents.slice(0, 3).map((event) => {
-                  const colors = EVENT_CATEGORY_COLORS[event.category];
+                {dayEvents.filter(e => !e.isDeclined).slice(0, 3).map((event) => {
+                  const colors = getEventColors(event);
                   return (
                     <div
                       key={event.id}
