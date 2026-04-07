@@ -52,3 +52,55 @@ The prediction is about reliable reasoning across large, heterogeneous personal 
 - How does the guided walkthrough transition to free exploration?
 - What specific scripted interactions does each trust level contain?
 - What does the x-ray mode show at each level?
+
+---
+
+## Session 2 — April 6, 2026 (Phase 1)
+
+### What happened
+
+Scaffolded the entire project, built the agent data model, marketplace UI, and deployed to Vercel. Phase 1 is complete and live.
+
+### What was built
+
+1. **Project scaffold**: Next.js 16 (App Router), TypeScript, Tailwind CSS v4, shadcn/ui (base-ui), next-themes, lucide-react
+2. **Claude.ai warm palette**: Custom CSS variables in oklch color space — cream background, warm gray text, terracotta (#D97757) accent, 12px border radius. Full dark mode support.
+3. **Agent data model** (`src/lib/agents/data.ts`): All 33 agents across 8 categories + 3 meta agents with TypeScript types, descriptions, lucide icon mappings, and helper functions
+4. **Marketplace UI**: Hero header, responsive 3-column agent card grid, category filtering via URL search params, "Add to Team" / "Remove" interactions
+5. **Sidebar**: Category navigation with counts, "Your Team" section with persistent state, Meta Agents section with lock icons
+6. **App shell**: Persistent sidebar + main content layout, X-Ray Mode toggle (UI only), theme toggle, mobile hamburger sidebar (Sheet), footer badge
+7. **Agent detail placeholder**: `/agents/[id]` route with back link, agent info, and Phase 2 placeholder
+8. **State management**: TeamProvider (React context + localStorage persistence), XRayProvider (React context), mounted flag pattern for hydration safety
+9. **Deployment**: GitHub repo (jamesstineheath/anthropic-demo), Vercel production deployment
+
+### Technical decisions
+
+- **shadcn/ui v4 uses base-ui** (not Radix): No `asChild` prop on Trigger components — render children directly inside triggers instead
+- **Next.js 16**: `params` and `searchParams` are Promises that must be awaited
+- **Category filtering via URL search params**: Shareable, back-button friendly, no extra state needed
+- **Icon map pattern**: Explicit imports of 37 lucide icons mapped by string name — tree-shakeable, no dynamic imports
+- **oklch color space**: Used for all CSS variables to match shadcn/ui v4 conventions
+
+### Live URLs
+
+- **Vercel**: https://anthropic-demo-beige.vercel.app
+- **GitHub**: https://github.com/jamesstineheath/anthropic-demo
+
+### Verified
+
+- [x] `npm run build` passes with no errors
+- [x] All 33 agents + 3 meta agents render correctly
+- [x] Category filtering works (sidebar clicks filter grid, URL updates)
+- [x] "Add to Team" adds agent to sidebar, persists on refresh via localStorage
+- [x] Dark mode toggle works with warm dark palette
+- [x] Mobile responsive: sidebar collapses to hamburger, grid reflows
+- [x] Agent detail placeholder page renders correctly
+- [x] Meta agents show prerequisites as badge pills
+- [x] Overall aesthetic matches Claude.ai's warm, spacious design language
+
+### What's next (Phase 2)
+
+- Build the Calendaring deep agent detail page with calendar work surface
+- Implement trust stage progression (interactive stages 0-5)
+- Build the chat interface with scripted responses
+- Implement X-Ray Mode functionality (showing model internals at each trust level)
