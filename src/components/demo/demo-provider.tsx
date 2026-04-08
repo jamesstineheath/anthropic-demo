@@ -209,8 +209,10 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
           break;
       }
     };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    // Use capture phase so arrow keys work even when a dialog portal
+    // calls stopPropagation during the bubble phase (base-ui behavior).
+    window.addEventListener("keydown", handleKeyDown, true);
+    return () => window.removeEventListener("keydown", handleKeyDown, true);
   }, [nextMode, prevMode, nextStep, prevStep]);
 
   return (
